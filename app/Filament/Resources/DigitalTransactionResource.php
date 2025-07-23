@@ -79,15 +79,28 @@ class DigitalTransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
-                TextColumn::make('digitalProduct.name')->label('Produk Digital')->searchable(),
-                TextColumn::make('brand.name')->label('Brand')->sortable(),
-                TextColumn::make('harga_jual')->label('Harga')->money('IDR'),
-                TextColumn::make('user.name')->label('Kasir'),
-                TextColumn::make('transaction_date')->label('Tanggal')->dateTime(),
-                TextColumn::make('created_at')->label('Dibuat')->since(),
+                TextColumn::make('id')
+                    ->label('No.')
+                    ->rowIndex(),
+
+                TextColumn::make('keterangan')
+                    ->label('Keterangan')
+                    ->getStateUsing(function ($record) {
+                        $produk = $record->digitalProduct?->name ?? '';
+                        $brand = $record->brand?->name ?? '';
+                        return trim("{$produk} {$brand}");
+                    }),
+
+                TextColumn::make('harga_jual')
+                    ->label('Bayar')
+                    ->money('IDR'),
+
+                TextColumn::make('transaction_date')
+                    ->label('Tanggal')
+                    ->getStateUsing(fn ($record) => \Carbon\Carbon::parse($record->transaction_date)->translatedFormat('d F Y')),
             ])
             ->filters([
-                TrashedFilter::make(), // untuk soft deletes
+                TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
