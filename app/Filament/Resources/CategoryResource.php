@@ -29,6 +29,11 @@ class CategoryResource extends Resource
                 ->required()
                 ->maxLength(255),
 
+            Forms\Components\TextInput::make('kode_category')
+                ->label('Kode Kategori')
+                ->required()
+                ->maxLength(50),
+
             Forms\Components\HasManyRepeater::make('subCategories')
                 ->relationship('subCategories')
                 ->schema([
@@ -52,6 +57,9 @@ class CategoryResource extends Resource
                         return $rowLoop->iteration;
                     }
                 ),
+
+            Tables\Columns\TextColumn::make('kode_category')
+                ->label('Kode'),
 
             Tables\Columns\TextColumn::make('nama')
                 ->label('Kategori'),

@@ -19,6 +19,7 @@ class DigitalCategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = 'Digital Categories';
+    protected static ?string $navigationGroup = 'Digital Product';
     protected static ?string $pluralModelLabel = 'Digital Categories';
 
     public static function form(Form $form): Form

@@ -19,10 +19,10 @@ class DigitalProductResource extends Resource
     protected static ?string $model = DigitalProduct::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';
-
     protected static ?string $navigationLabel = 'Digital Product';
     protected static ?string $modelLabel = 'Digital Product';
     protected static ?string $pluralModelLabel = 'Digital Products';
+    protected static ?string $navigationGroup = 'Digital Product';
 
     public static function form(Form $form): Form
     {

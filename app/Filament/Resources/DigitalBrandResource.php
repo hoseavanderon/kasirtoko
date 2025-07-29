@@ -20,6 +20,7 @@ class DigitalBrandResource extends Resource
     protected static ?string $model = DigitalBrand::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Digital Product';
 
     public static function form(Form $form): Form
     {

@@ -10,10 +10,19 @@ class Pembukuan extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'pembukuan';
+
     protected $fillable = [
         'deskripsi',
         'type',
         'nominal',
         'sisa_saldo',
+        'user_id',
+        'category_pembukuan_id'
     ];
+
+    public function categoryPembukuan()
+    {
+        return $this->belongsTo(CategoryPembukuan::class);
+    }
 }

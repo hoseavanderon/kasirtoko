@@ -10,15 +10,23 @@ class ProductAttributeValue extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['id_product', 'id_attribute', 'attribute_value'];
+    protected $fillable = [
+        'product_id',
+        'attribute_id',
+        'attribute_value',
+        'stok',
+        'last_restock_date',
+        'last_sale_date',
+        'user_id',
+    ];
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'id_product');
+        return $this->belongsTo(Product::class, 'product-id');
     }
 
     public function attribute()
     {
-        return $this->belongsTo(ProductAttribute::class, 'id_attribute');
+        return $this->belongsTo(ProductAttribute::class, 'attribute_id');
     }
 }

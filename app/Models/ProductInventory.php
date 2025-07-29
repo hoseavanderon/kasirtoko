@@ -11,15 +11,16 @@ class ProductInventory extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'id_product',
+        'product_id',
         'stok',
         'last_restock_date',
         'last_sale_date',
         'minimal_stok',
+        'user_id'
     ];
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'id_product');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

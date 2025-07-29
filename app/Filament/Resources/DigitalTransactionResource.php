@@ -20,6 +20,13 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Button;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Actions;
 
 class DigitalTransactionResource extends Resource
 {
@@ -63,6 +70,17 @@ class DigitalTransactionResource extends Resource
                 ->required()
                 ->numeric()
                 ->prefix('Rp'),
+        
+            Actions::make(
+                collect([7000, 12000, 17000, 22000, 27000, 52000, 102000, 152000, 202000, 252000, 302000, 502000])
+                    ->map(fn ($nominal) =>
+                        Actions\Action::make("btn_$nominal")
+                            ->label('Rp ' . number_format($nominal, 0, ',', '.'))
+                            ->color('secondary')
+                            ->action(fn (callable $set) => $set('harga_jual', $nominal))
+                    )
+                    ->toArray()
+            ),
 
             DateTimePicker::make('transaction_date')
                 ->default(now())
@@ -72,6 +90,7 @@ class DigitalTransactionResource extends Resource
             Forms\Components\Hidden::make('user_id')
                 ->default(fn () => Auth::id())
                 ->dehydrated(),
+
         ])
         ->columns(2);
     }
