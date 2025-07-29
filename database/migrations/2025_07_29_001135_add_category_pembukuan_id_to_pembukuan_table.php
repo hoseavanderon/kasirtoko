@@ -9,17 +9,22 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('pembukuan', function (Blueprint $table) {
-            $table->foreignId('category_pembukuan_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('category_pembukuan_id')->nullable()->after('id');
+
+            $table->foreign('category_pembukuan_id')
+                ->references('id')
+                ->on('category_pembukuans')
+                ->onDelete('set null');
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('pembukuan', function (Blueprint $table) {
             $table->dropForeign(['category_pembukuan_id']);
