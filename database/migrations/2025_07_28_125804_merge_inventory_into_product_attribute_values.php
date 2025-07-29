@@ -34,6 +34,10 @@ return new class extends Migration
         });
 
         Schema::table('product_attribute_values', function (Blueprint $table) {
+            // Hapus foreign key constraint dulu
+            $table->dropForeign(['user_id']);
+
+            // Baru hapus kolom-kolomnya
             $table->dropColumn([
                 'stok',
                 'last_restock_date',
