@@ -84,6 +84,8 @@ return [
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
+    'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key
