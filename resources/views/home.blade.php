@@ -107,7 +107,7 @@
                 <!-- Cart Section -->
                 <div class="cart-section">
                     <div class="cart-header">
-                        <h3>asd</h3>
+                        <h3>Keranjang</h3>
                         <button class="clear-cart" id="clearCartBtn">🗑️</button>
                     </div>
                     <div class="cart-items" id="cartItems">
