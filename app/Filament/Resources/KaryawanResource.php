@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -21,7 +22,7 @@ class KaryawanResource extends Resource
     protected static ?string $navigationLabel = 'Karyawan';
     protected static ?string $pluralModelLabel = 'Karyawan';
     protected static ?string $modelLabel = 'Karyawan';
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = 'Karyawan';
 
     public static function form(Form $form): Form
     {
@@ -48,6 +49,10 @@ class KaryawanResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
+
                 Tables\Columns\TextColumn::make('nama')
                     ->label('Nama')
                     ->searchable()
@@ -55,17 +60,16 @@ class KaryawanResource extends Resource
 
                 Tables\Columns\TextColumn::make('bekerja_sejak')
                     ->label('Bekerja Sejak')
-                    ->date()
+                    ->formatStateUsing(fn ($state) => 
+                        Carbon::parse($state)->translatedFormat('d F Y')
+                    )
                     ->sortable(),
 
                 Tables\Columns\ImageColumn::make('foto')
                     ->label('Foto')
+                    ->disk('public')
                     ->circular(),
                 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->dateTime()
-                    ->sortable(),
             ])
             ->filters([])
             ->actions([

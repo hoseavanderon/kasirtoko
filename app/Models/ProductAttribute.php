@@ -6,5 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductAttribute extends Model
 {
-    //
-}
+    protected $fillable = [
+        'nama_attribute',
+        'data_type',
+    ];
+}   
