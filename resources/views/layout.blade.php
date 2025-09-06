@@ -18,7 +18,7 @@
                     <div class="d-flex align-items-center">
                         <i class="bi bi-shop me-3 fs-3"></i>
                         <div>
-                            <h5 class="mb-0">RESTO DJAJA - KASIR 1</h5>
+                            <h5 class="mb-0">{{ Auth::user()->name }}</h5>
                             <small class="opacity-75">Status: Online</small>
                         </div>
                     </div>
