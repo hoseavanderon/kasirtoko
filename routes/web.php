@@ -12,5 +12,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/partial/{page}', [HomeController::class, 'loadPartial']);
     Route::get('/filter-products', [HomeController::class, 'filterProducts']);
-    Route::post('/search-barcode', [ProductController::class, 'searchByBarcode'])->name('products.searchByBarcode');
+    Route::post('/products/search-by-barcode', [ProductController::class, 'searchByBarcode'])->name('products.searchByBarcode');
 });

@@ -93,6 +93,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <div class="col-lg-3 col-md-3">
         <div class="cart-sidebar p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -105,7 +107,7 @@
             <div class="cart-items" style="max-height: 300px; overflow-y: auto;" id="cart-items">
                 <div class="text-center py-4 text-muted" id="empty-cart">
                     <i class="bi bi-cart-x fs-1"></i>
-                    <p class="mt-2">Cart is empty</p>
+                    <p class="mt-2">Keranjang Kosong</p>
                 </div>
             </div>
 
@@ -263,6 +265,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    document.getElementById('clear-cart-btn').addEventListener('click', function () {
+        Swal.fire({
+            title: 'Hapus Semua Produk di Keranjang?',
+            text: "Tindakan ini tidak bisa dibatalkan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, kosongkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                cartItems = {};
+                renderCartItems();
+                updateCartTotals();
+
+                Swal.fire({
+                    title: 'Keranjang dikosongkan!',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
+    });
+
     // ====================== HELPER FUNCTIONS ======================
     function showAlert(message, type = 'success') {
         const alertBox = document.createElement('div');
@@ -293,32 +321,75 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderCartItems() {
         const cartContainer = document.getElementById('cart-items');
-        cartContainer.innerHTML = '';
+        const emptyCartEl = document.getElementById('empty-cart');
+
+        // Reset isi cart container (hapus semua item dulu)
+        cartContainer.innerHTML = `
+            <div class="text-center py-4 text-muted" id="empty-cart">
+                <i class="bi bi-cart-x fs-1"></i>
+                <p class="mt-2">Keranjang Kosong</p>
+            </div>
+        `;
 
         const items = Object.values(cartItems);
 
-        if (items.length === 0) {
-            document.getElementById('empty-cart').style.display = 'block';
-            return;
-        }
+        // Jika tidak ada item, tampilkan kembali "Keranjang Kosong"
+        if (items.length === 0) return;
 
-        document.getElementById('empty-cart').style.display = 'none';
+        // Jika ada item, hapus elemen "empty-cart"
+        const emptyCart = document.getElementById('empty-cart');
+        if (emptyCart) emptyCart.remove();
 
+        // Tampilkan item-item di keranjang
         items.forEach(item => {
             const itemEl = document.createElement('div');
             itemEl.className = 'cart-item mb-2';
             itemEl.innerHTML = `
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <div class="fw-semibold">${item.nama_produk}</div>
                         <small class="text-muted">x${item.quantity}</small>
                     </div>
                     <div class="text-end">
                         <div class="fw-bold">Rp ${formatRupiah(item.harga * item.quantity)}</div>
+                        <button class="btn btn-sm btn-link text-danger p-0 remove-item-btn" data-id="${item.id}" title="Hapus item">
+                            <i class="bi bi-x-circle-fill fs-5"></i>
+                        </button>
                     </div>
                 </div>
             `;
             cartContainer.appendChild(itemEl);
+        });
+
+        // Tambahkan event ke tombol hapus per item
+        document.querySelectorAll('.remove-item-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+
+                Swal.fire({
+                    title: 'Hapus Produk Ini?',
+                    text: "Produk akan dihapus dari keranjang.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        delete cartItems[id];
+                        renderCartItems();
+                        updateCartTotals();
+
+                        Swal.fire({
+                            title: 'Produk dihapus!',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
         });
     }
 
