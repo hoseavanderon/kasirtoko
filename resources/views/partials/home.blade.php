@@ -124,7 +124,8 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">Payment Amount</label>
                     <input
-                        type="number"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
                         class="form-control"
                         id="paid-amount"
                         placeholder="Enter amount..."
@@ -289,6 +290,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
         });
+    });
+
+    document.getElementById('paid-amount').addEventListener('touchstart', function () {
+        this.focus();
     });
 
     // ====================== HELPER FUNCTIONS ======================

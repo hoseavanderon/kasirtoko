@@ -106,6 +106,28 @@ body {
   padding: 15px 10px;
 }
 
+.cart-item .d-flex {
+    flex-direction: column;
+}
+
+.cart-item .text-end {
+    margin-top: 4px;
+    align-self: flex-end;
+}
+
+@media (max-width: 768px) {
+    .cart-item .d-flex {
+        flex-direction: column !important;
+        align-items: flex-start;
+    }
+
+    .cart-item .text-end {
+        text-align: left !important;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
+
 .denomination-btn {
   min-width: 80px;
   margin: 3px;
