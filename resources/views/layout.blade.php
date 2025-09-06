@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Professional POS System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -19,7 +20,10 @@
                         <i class="bi bi-shop me-3 fs-3"></i>
                         <div>
                             <h5 class="mb-0">{{ Auth::user()->name }}</h5>
-                            <small class="opacity-75">Status: Online</small>
+                            <small class="opacity-75">
+                                <span class="status-dot bg-success me-1"></span>
+                                Online
+                            </small>
                         </div>
                     </div>
                 </div>

@@ -54,6 +54,10 @@ body {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
+.category-item.fw-bold {
+    font-size: 15px;
+}
+
 .product-card {
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -242,4 +246,11 @@ body {
 .fullscreen-btn:hover {
     background-color: #0d6efd;
     color: white;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
 }

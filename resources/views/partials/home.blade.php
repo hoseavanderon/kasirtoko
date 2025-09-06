@@ -2,31 +2,39 @@
     <div class="col-lg-2 col-md-3">
         <div class="sidebar p-3">
             <h6 class="text-muted mb-3 fw-bold">PRODUCT CATEGORIES</h6>
-            <div class="d-grid gap-1" id="categories-list">
-                <div class="d-grid gap-1" id="categories-list">
-                    <button class="category-item">
-                        <i class="bi bi-heart me-2"></i> 
-                        Nama Kategori
-                    </button>
+            <div class="d-grid gap-2" id="categories-list">
+                @foreach ($categories as $category)
+                    <div class="mb-2">
+                        <!-- Tombol kategori -->
+                        <button type="button"
+                            class="category-item w-100 text-start fw-bold"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse-{{ $category->id }}"
+                            aria-expanded="false"
+                            aria-controls="collapse-{{ $category->id }}">
+                            <i class="bi bi-folder me-2"></i>
+                            {{ $category->nama }}
+                        </button>
 
-                    <button class="category-item">
-                        <i class="bi bi-heart me-2"></i> 
-                        Nama Kategori
-                    </button>
-
-                    <button class="category-item">
-                        <i class="bi bi-heart me-2"></i> 
-                        Nama Kategori
-                    </button>
-
-                    <button class="category-item">
-                        <i class="bi bi-heart me-2"></i> 
-                        Nama Kategori
-                    </button>
-                </div>
+                        <!-- Subkategori yang collapsible -->
+                        <div class="collapse ms-3 mt-1" id="collapse-{{ $category->id }}">
+                            <!-- Subkategori -->
+                            @foreach ($category->subcategories as $sub)
+                                <button type="button"
+                                    class="category-item w-100 text-start subcategory-btn"
+                                    data-id="{{ $sub->id }}"
+                                    data-type="subcategory">
+                                    <i class="bi bi-chevron-right me-2"></i>
+                                    {{ $sub->nama }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
+
 
     <div class="col-lg-7 col-md-6">
         <div class="p-4">
@@ -56,47 +64,31 @@
             </div>
 
             <div class="row g-3" id="products-grid">
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card fade-in" data-product-id="">
-                        <div class="product-image">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        <div class="card-body p-3">
-                            <h6 class="card-title mb-2 fw-semibold">Nama Produk</h6>
-                            <p class="card-text text-primary fw-bold mb-0">
-                                Rp 10.000
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card fade-in" data-product-id="">
-                        <div class="product-image">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        <div class="card-body p-3">
-                            <h6 class="card-title mb-2 fw-semibold">Nama Produk</h6>
-                            <p class="card-text text-primary fw-bold mb-0">
-                                Rp 10.000
-                            </p>
+                @forelse ($products as $product)
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card fade-in" data-product-id="{{ $product->id }}">
+                            <div class="product-image">
+                                <i class="bi bi-box-seam"></i> {{-- kamu bisa ganti dengan gambar produk --}}
+                            </div>
+                            <div class="card-body p-3">
+                                <h6 class="card-title mb-2 fw-semibold">{{ $product->nama_produk }}</h6>
+                                <p class="card-text text-primary fw-bold mb-0">
+                                    Rp {{ number_format($product->jual, 0, ',', '.') }}
+                                </p>
+                                <p class="text-muted small pt-1 mb-0">
+                                    {{ $product->barcode }}
+                                </p>
+                                <div class="mt-2">
+                                    {!! DNS1D::getBarcodeHTML($product->barcode, 'C128', 1.5, 40) !!}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card fade-in" data-product-id="">
-                        <div class="product-image">
-                            <i class="bi bi-box-seam"></i>
-                        </div>
-                        <div class="card-body p-3">
-                            <h6 class="card-title mb-2 fw-semibold">Nama Produk</h6>
-                            <p class="card-text text-primary fw-bold mb-0">
-                                Rp 10.000
-                            </p>
-                        </div>
+                @empty
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Tidak ada produk ditemukan.</p>
                     </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -213,4 +205,142 @@
         </div>
     </div>
 
-   
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // ====================== HANDLE SUBCATEGORY FILTER ======================
+    const subcategoryButtons = document.querySelectorAll('.subcategory-btn');
+
+    function setActive(activeButton) {
+        subcategoryButtons.forEach(btn => btn.classList.remove('active'));
+        if (activeButton) activeButton.classList.add('active');
+    }
+
+    function loadProducts(id) {
+        fetch(`/filter-products?type=subcategory&id=${id}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('products-grid').innerHTML = data.html;
+                document.getElementById('category-title').textContent = data.title;
+            });
+    }
+
+    subcategoryButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            setActive(btn);
+            loadProducts(id);
+        });
+    });
+
+    // ====================== HANDLE BARCODE SCAN & ADD TO CART ======================
+    document.getElementById('barcode-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const barcode = document.getElementById('barcode-input').value.trim();
+        if (!barcode) return;
+
+        fetch("{{ route('products.searchByBarcode') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({ barcode: barcode }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showAlert(data.error, 'danger');
+            } else {
+                addToCart(data);
+                showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
+                document.getElementById('barcode-input').value = '';
+            }
+        })
+        .catch(err => {
+            showAlert('Terjadi kesalahan saat mencari produk.', 'danger');
+            console.error(err);
+        });
+    });
+
+    // ====================== HELPER FUNCTIONS ======================
+    function showAlert(message, type = 'success') {
+        const alertBox = document.createElement('div');
+        alertBox.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-4`;
+        alertBox.style.zIndex = 9999;
+        alertBox.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertBox);
+        setTimeout(() => alertBox.remove(), 3000);
+    }
+
+    let cartItems = {};
+    function addToCart(product) {
+        if (cartItems[product.id]) {
+            cartItems[product.id].quantity += 1;
+        } else {
+            cartItems[product.id] = {
+                ...product,
+                quantity: 1
+            };
+        }
+
+        renderCartItems();
+        updateCartTotals();
+    }
+
+    function renderCartItems() {
+        const cartContainer = document.getElementById('cart-items');
+        cartContainer.innerHTML = '';
+
+        const items = Object.values(cartItems);
+
+        if (items.length === 0) {
+            document.getElementById('empty-cart').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('empty-cart').style.display = 'none';
+
+        items.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'cart-item mb-2';
+            itemEl.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="fw-semibold">${item.nama_produk}</div>
+                        <small class="text-muted">x${item.quantity}</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold">Rp ${formatRupiah(item.harga * item.quantity)}</div>
+                    </div>
+                </div>
+            `;
+            cartContainer.appendChild(itemEl);
+        });
+    }
+
+    function updateCartTotals() {
+        let total = 0;
+        Object.values(cartItems).forEach(item => {
+            total += item.harga * item.quantity;
+        });
+
+        document.getElementById('subtotal').innerText = formatRupiah(total);
+        document.getElementById('total').innerText = formatRupiah(total);
+
+        const paymentBtn = document.getElementById('process-payment-btn');
+        paymentBtn.disabled = total === 0;
+    }
+
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(number);
+    }
+});
+</script>
