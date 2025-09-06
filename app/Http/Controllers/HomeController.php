@@ -10,4 +10,13 @@ class HomeController extends Controller
     {
         return view('home'); 
     }
+
+    public function loadPartial($page)
+    {
+        if (view()->exists("partials.$page")) {
+            return view("partials.$page");
+        }
+
+        return response('Page not found', 404);
+    }
 }
