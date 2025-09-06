@@ -129,6 +129,7 @@
                         class="form-control"
                         id="paid-amount"
                         placeholder="Enter amount..."
+                        readonly
                     />
                 </div>
 
@@ -292,8 +293,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    document.getElementById('paid-amount').addEventListener('touchstart', function () {
-        this.focus();
+    const input = document.getElementById('paid-amount');
+
+    input.addEventListener('focus', () => {
+    if (input.hasAttribute('readonly')) {
+        input.removeAttribute('readonly');
+        input.focus();
+    }
     });
 
     // ====================== HELPER FUNCTIONS ======================
