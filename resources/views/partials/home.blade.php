@@ -36,7 +36,7 @@
     </div>
 
 
-    <div class="col-lg-7 col-md-5">
+    <div class="col-lg-6 col-md-5">
         <div class="p-4">
             <div class="mb-4">
                 <form id="barcode-form">
@@ -95,7 +95,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <div class="col-lg-3 col-md-5">
+    <div class="col-lg-4 col-md-5">
         <div class="cart-sidebar p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0">Keranjang Belanja</h6>
