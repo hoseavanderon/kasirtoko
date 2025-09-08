@@ -50,6 +50,7 @@
                             id="barcode-input"
                             placeholder="Scan barcode..."
                             autocomplete="off"
+                            inputmode="none"
                             autofocus
                         />
                         <button class="btn btn-primary" type="submit">
