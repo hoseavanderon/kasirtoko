@@ -20,6 +20,22 @@ body {
   overflow-x: hidden;
 }
 
+.header {
+    padding: 0.25rem 0 !important; /* lebih tipis dari default */
+}
+.header .container-fluid {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.subcategory-btn {
+    font-size: 0.85rem;      /* lebih kecil */
+    padding: 4px 8px;
+    white-space: nowrap;     /* jangan pecah baris */
+    overflow: hidden;        /* sembunyikan yang kepanjangan */
+    text-overflow: ellipsis; /* kasih "..." kalau kepanjangan */
+}
+
 .pos-container {
   min-height: 100vh;
   background: rgba(255, 255, 255, 0.95);

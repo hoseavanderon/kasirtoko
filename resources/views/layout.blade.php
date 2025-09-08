@@ -19,7 +19,7 @@
                     <div class="d-flex align-items-center">
                         <i class="bi bi-shop me-3 fs-3"></i>
                         <div>
-                            <h5 class="mb-0">{{ Auth::user()->name }}</h5>
+                            <h6 class="mb-0">{{ Auth::user()->name }}</h6>
                             <small class="opacity-75">
                                 <span class="status-dot bg-success me-1"></span>
                                 Online
