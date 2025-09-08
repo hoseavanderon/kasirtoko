@@ -71,7 +71,7 @@
                                 <i class="bi bi-box-seam"></i> {{-- kamu bisa ganti dengan gambar produk --}}
                             </div>
                             <div class="card-body p-3">
-                                <h6 class="card-title mb-2 fw-semibold">{{ $product->nama_produk }}</h6>
+                                <h6 class="card-title mb-2 fw-semibold text-truncate">{{ $product->nama_produk }}</h6>
                                 <p class="card-text text-primary fw-bold mb-0">
                                     Rp {{ number_format($product->jual, 0, ',', '.') }}
                                 </p>
@@ -150,7 +150,7 @@
                             <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="100000">Rp 100.000</button>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="200000">Rp 200.000</button>
+                            <button class="btn btn-success w-100" id="exact-btn">UANG PAS</button>
                         </div>
                     </div>
 
@@ -175,7 +175,7 @@
 
                 <div class="mb-3">
                     <div class="d-flex justify-content-between">
-                        <span class="fw-bold">Change:</span>
+                        <span class="fw-bold">Kembalian:</span>
                         <span class="fw-bold" id="change">Rp 0</span>
                     </div>
                 </div>
@@ -215,7 +215,7 @@
                             <span class="fw-bold" id="summary-paid">Rp0</span>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <span>Change:</span>
+                            <span>Kembalian :</span>
                             <span class="fw-bold" id="summary-change">Rp0</span>
                         </div>
                     </div>
@@ -250,6 +250,22 @@ function initPageScripts() {
     const formatNumberID = (n) => (n ?? 0).toLocaleString('id-ID');              // 12.345
     const formatRupiah   = (n) => `Rp ${formatNumberID(n)}`;                      // Rp 12.345
     const parseRupiah    = (s) => parseInt((s || '').toString().replace(/[^0-9]/g, ''), 10) || 0;
+
+    function getCartTotal() {
+        let total = 0;
+        Object.values(cartItems).forEach(item => {
+            total += item.harga * item.quantity;
+        });
+        return total;
+    }
+
+    const exactBtn = document.getElementById('exact-btn');
+    if (exactBtn) {
+        exactBtn.addEventListener('click', () => {
+            paidAmount = getCartTotal(); // isi state paidAmount
+            updateDisplays();            // refresh tampilan
+        });
+    }
 
     // ====================== CATEGORY FILTER ======================
     const subcategoryButtons = document.querySelectorAll('.subcategory-btn');
