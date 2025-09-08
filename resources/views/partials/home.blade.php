@@ -65,7 +65,7 @@
 
             <div class="row g-3" id="products-grid">
                 @forelse ($products as $product)
-                    <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="col-lg-4 col-md-4 col-sm-6">
                         <div class="product-card fade-in" data-product-id="{{ $product->id }}">
                             <div class="product-image">
                                 <i class="bi bi-box-seam"></i> {{-- kamu bisa ganti dengan gambar produk --}}
@@ -128,14 +128,30 @@
 
                     <!-- Quick Denominations -->
                     <div class="row g-2">
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 1.000</button></div>
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 2.000</button></div>
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 5.000</button></div>
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 10.000</button></div>
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 20.000</button></div>
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 50.000</button></div>
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 100.000</button></div>
-                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 200.000</button></div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="1000">Rp 1.000</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="2000">Rp 2.000</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="5000">Rp 5.000</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="10000">Rp 10.000</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="20000">Rp 20.000</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="50000">Rp 50.000</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="100000">Rp 100.000</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100 denomination-btn" data-amount="200000">Rp 200.000</button>
+                        </div>
                     </div>
 
                     <!-- Custom Keypad -->
