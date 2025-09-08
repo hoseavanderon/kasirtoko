@@ -1,7 +1,7 @@
 
     <div class="col-lg-2 col-md-3">
         <div class="sidebar p-3">
-            <h6 class="text-muted mb-3 fw-bold">PRODUCT CATEGORIES</h6>
+            <h6 class="text-muted mb-3 fw-bold">Kategori Barang</h6>
             <div class="d-grid gap-2" id="categories-list">
                 @foreach ($categories as $category)
                     <div class="mb-2">
@@ -48,7 +48,7 @@
                             type="text"
                             class="form-control scanner-input"
                             id="barcode-input"
-                            placeholder="Scan barcode or enter product code..."
+                            placeholder="Scan barcode..."
                             autocomplete="off"
                             autofocus
                         />
@@ -98,7 +98,7 @@
     <div class="col-lg-3 col-md-3">
         <div class="cart-sidebar p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0">SHOPPING CART</h6>
+                <h6 class="fw-bold mb-0">Keranjang Belanja</h6>
                 <button class="btn btn-outline-danger btn-sm" id="clear-cart-btn">
                     <i class="bi bi-trash"></i>
                 </button>
@@ -121,32 +121,39 @@
                     <span class="fw-bold text-primary fs-5" id="total">Rp 0</span>
                 </div>
 
+                <!-- Payment Input + Quick Denominations + Custom Keypad -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Payment Amount</label>
-                    <input
-                        inputmode="numeric"
-                        pattern="[0-9]*"
-                        class="form-control"
-                        id="paid-amount"
-                        placeholder="Enter amount..."
-                        readonly
-                    />
-                </div>
+                    <label class="form-label fw-bold">Total Bayar</label>
+                    <div class="text-center border rounded p-2 mb-2 bg-light fs-4 fw-bold" id="paid-display">Rp 0</div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Quick Denominations</label>
-                    <div class="d-flex flex-wrap" id="denominations">
-                        <button class="btn btn-outline-primary btn-sm denomination-btn" onclick="addDenomination(100000)">Rp100.000</button>
-                        <button class="btn btn-outline-primary btn-sm denomination-btn" onclick="addDenomination(50000)">Rp50.000</button>
-                        <button class="btn btn-outline-primary btn-sm denomination-btn" onclick="addDenomination(20000)">Rp20.000</button>
-                        <button class="btn btn-outline-primary btn-sm denomination-btn" onclick="addDenomination(10000)">Rp10.000</button>
-                        <button class="btn btn-outline-primary btn-sm denomination-btn" onclick="addDenomination(5000)">Rp5.000</button>
-                        <button class="btn btn-outline-primary btn-sm denomination-btn" onclick="addDenomination(2000)">Rp2.000</button>
-                        <button class="btn btn-outline-primary btn-sm denomination-btn" onclick="addDenomination(1000)">Rp1.000</button>
+                    <!-- Quick Denominations -->
+                    <div class="d-flex flex-wrap justify-content-center mb-3" id="denominations">
+                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="1000">Rp 1.000</button>
+                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="2000">Rp 2.000</button>
+                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="5000">Rp 5.000</button>
+                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="10000">Rp 10.000</button>
+                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="20000">Rp 20.000</button>
+                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="50000">Rp 50.000</button>
+                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="100000">Rp 100.000</button>
                     </div>
-                    <button class="btn btn-warning btn-sm denomination-btn mt-2" id="exact-btn">
-                        Exact
-                    </button>
+
+                    <!-- Custom Keypad -->
+                    <div class="keypad text-center">
+                        <div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); display: grid;">
+                            <button class="btn btn-outline-dark keypad-btn">1</button>
+                            <button class="btn btn-outline-dark keypad-btn">2</button>
+                            <button class="btn btn-outline-dark keypad-btn">3</button>
+                            <button class="btn btn-outline-dark keypad-btn">4</button>
+                            <button class="btn btn-outline-dark keypad-btn">5</button>
+                            <button class="btn btn-outline-dark keypad-btn">6</button>
+                            <button class="btn btn-outline-dark keypad-btn">7</button>
+                            <button class="btn btn-outline-dark keypad-btn">8</button>
+                            <button class="btn btn-outline-dark keypad-btn">9</button>
+                            <button class="btn btn-outline-dark keypad-btn">00</button>
+                            <button class="btn btn-outline-dark keypad-btn">0</button>
+                            <button class="btn btn-outline-danger keypad-btn" id="backspace">⌫</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -159,7 +166,7 @@
                 <div class="d-grid gap-2">
                     <button class="btn btn-primary btn-lg" id="process-payment-btn" disabled>
                         <i class="bi bi-credit-card me-2"></i>
-                        Process Payment
+                        Bayar
                     </button>
                 </div>
             </div>
@@ -209,9 +216,25 @@
         </div>
     </div>
 
+@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // ====================== HANDLE SUBCATEGORY FILTER ======================
+function initPageScripts() {
+    // ====================== STATE ======================
+    let cartItems   = {};
+    let paidAmount  = 0;
+
+    // ====================== ELEMENTS ======================
+    const paidDisplay   = document.getElementById('paid-display');
+    const changeDisplay = document.getElementById('change');
+    const totalDisplay  = document.getElementById('total');
+    const processBtn    = document.getElementById('process-payment-btn');
+
+    // ====================== UTILS (FORMAT & PARSE) ======================
+    const formatNumberID = (n) => (n ?? 0).toLocaleString('id-ID');              // 12.345
+    const formatRupiah   = (n) => `Rp ${formatNumberID(n)}`;                      // Rp 12.345
+    const parseRupiah    = (s) => parseInt((s || '').toString().replace(/[^0-9]/g, ''), 10) || 0;
+
+    // ====================== CATEGORY FILTER ======================
     const subcategoryButtons = document.querySelectorAll('.subcategory-btn');
 
     function setActive(activeButton) {
@@ -236,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ====================== HANDLE BARCODE SCAN & ADD TO CART ======================
+    // ====================== BARCODE SCAN ======================
     document.getElementById('barcode-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -249,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": '{{ csrf_token() }}',
             },
-            body: JSON.stringify({ barcode: barcode }),
+            body: JSON.stringify({ barcode }),
         })
         .then(response => response.json())
         .then(data => {
@@ -267,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // ====================== CLEAR CART ======================
     document.getElementById('clear-cart-btn').addEventListener('click', function () {
         Swal.fire({
             title: 'Hapus Semua Produk di Keranjang?',
@@ -282,40 +306,92 @@ document.addEventListener('DOMContentLoaded', function () {
                 cartItems = {};
                 renderCartItems();
                 updateCartTotals();
-
-                Swal.fire({
-                    title: 'Keranjang dikosongkan!',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
+                showAlert('Keranjang dikosongkan!', 'success');
             }
         });
     });
 
-    const input = document.getElementById('paid-amount');
+    // ====================== CLICK PRODUCT CARD (DELEGATION) ======================
+    document.getElementById('products-grid').addEventListener('click', function(e) {
+        const card = e.target.closest('.product-card');
+        if (!card) return;
 
-    input.addEventListener('focus', () => {
-    if (input.hasAttribute('readonly')) {
-        input.removeAttribute('readonly');
-        input.focus();
-    }
+        const productId = card.dataset.productId;
+
+        fetch(`/products/get/${productId}`)
+            .then(response => response.json())
+            .then(product => {
+                if (product.error) {
+                    showAlert(product.error, 'danger');
+                } else {
+                    addToCart(product);
+                    showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showAlert('Gagal menambahkan produk.', 'danger');
+            });
     });
 
-    // ====================== HELPER FUNCTIONS ======================
-    function showAlert(message, type = 'success') {
-        const alertBox = document.createElement('div');
-        alertBox.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-4`;
-        alertBox.style.zIndex = 9999;
-        alertBox.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        document.body.appendChild(alertBox);
-        setTimeout(() => alertBox.remove(), 3000);
+    // ====================== PAYMENT (DENOM + KEYPAD) ======================
+    function getTotalAmount() {
+        return parseRupiah(totalDisplay.textContent);
     }
 
-    let cartItems = {};
+    function updateDisplays() {
+        paidDisplay.textContent = formatRupiah(paidAmount);
+
+        const totalAmount = getTotalAmount();
+        const change = paidAmount - totalAmount;
+
+        changeDisplay.textContent = formatRupiah(Math.max(change, 0));
+
+        // enable/disable Process Payment
+        processBtn.disabled = (totalAmount === 0) || (paidAmount < totalAmount);
+    }
+
+    // Quick denominations (PASTIKAN tidak ada handler lama addDenomination)
+    document.querySelectorAll('.denomination-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            paidAmount += parseInt(btn.dataset.amount, 10) || 0;
+            updateDisplays();
+        });
+    });
+
+    // Numpad custom
+    document.querySelectorAll('.keypad-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.textContent.trim();
+            if (btn.id === "backspace") {
+                paidAmount = Math.floor(paidAmount / 10);
+            } else {
+                paidAmount = parseInt(`${paidAmount}${val}`, 10) || 0;
+            }
+            updateDisplays();
+        });
+    });
+
+    // ====================== ALERT HELPER ======================
+    function showAlert(message, type = 'success') {
+        let icon = 'success';
+
+        if (type === 'danger') icon = 'error';
+        else if (type === 'warning') icon = 'warning';
+        else if (type === 'info') icon = 'info';
+
+        Swal.fire({
+            text: message,
+            icon: icon,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+        });
+    }
+
+    // ====================== CART ======================
     function addToCart(product) {
         if (cartItems[product.id]) {
             cartItems[product.id].quantity += 1;
@@ -325,16 +401,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 quantity: 1
             };
         }
-
         renderCartItems();
         updateCartTotals();
     }
 
     function renderCartItems() {
         const cartContainer = document.getElementById('cart-items');
-        const emptyCartEl = document.getElementById('empty-cart');
 
-        // Reset isi cart container (hapus semua item dulu)
+        // Reset container
         cartContainer.innerHTML = `
             <div class="text-center py-4 text-muted" id="empty-cart">
                 <i class="bi bi-cart-x fs-1"></i>
@@ -343,15 +417,13 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         const items = Object.values(cartItems);
-
-        // Jika tidak ada item, tampilkan kembali "Keranjang Kosong"
         if (items.length === 0) return;
 
-        // Jika ada item, hapus elemen "empty-cart"
+        // Hapus "Keranjang Kosong"
         const emptyCart = document.getElementById('empty-cart');
         if (emptyCart) emptyCart.remove();
 
-        // Tampilkan item-item di keranjang
+        // Render items
         items.forEach(item => {
             const itemEl = document.createElement('div');
             itemEl.className = 'cart-item mb-2';
@@ -362,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <small class="text-muted">x${item.quantity}</small>
                     </div>
                     <div class="text-end">
-                        <div class="fw-bold">Rp ${formatRupiah(item.harga * item.quantity)}</div>
+                        <div class="fw-bold">${formatRupiah(item.harga * item.quantity)}</div>
                         <button class="btn btn-sm btn-link text-danger p-0 remove-item-btn" data-id="${item.id}" title="Hapus item">
                             <i class="bi bi-x-circle-fill fs-5"></i>
                         </button>
@@ -372,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cartContainer.appendChild(itemEl);
         });
 
-        // Tambahkan event ke tombol hapus per item
+        // Remove item handlers
         document.querySelectorAll('.remove-item-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const id = this.dataset.id;
@@ -391,13 +463,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         delete cartItems[id];
                         renderCartItems();
                         updateCartTotals();
-
-                        Swal.fire({
-                            title: 'Produk dihapus!',
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                        showAlert('Produk dihapus!', 'success');
                     }
                 });
             });
@@ -407,22 +473,20 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateCartTotals() {
         let total = 0;
         Object.values(cartItems).forEach(item => {
-            total += item.harga * item.quantity;
+            total += (item.harga * item.quantity);
         });
 
         document.getElementById('subtotal').innerText = formatRupiah(total);
-        document.getElementById('total').innerText = formatRupiah(total);
+        document.getElementById('total').innerText    = formatRupiah(total);
 
-        const paymentBtn = document.getElementById('process-payment-btn');
-        paymentBtn.disabled = total === 0;
+        // Setelah total berubah, update kembalian & tombol payment
+        updateDisplays();
     }
 
-    function formatRupiah(number) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(number);
-    }
-});
+    // ====================== INIT ======================
+    updateDisplays();
+}
+
+document.addEventListener('DOMContentLoaded', initPageScripts);
 </script>
+@endpush

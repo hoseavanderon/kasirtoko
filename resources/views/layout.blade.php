@@ -102,6 +102,11 @@
                     const content = await response.text();
                     document.getElementById('dynamic-page-container').innerHTML = content;
 
+                    // 🧠 Tambahkan baris ini
+                    if (typeof initPageScripts === 'function') {
+                        initPageScripts(); 
+                    }
+
                     // ✅ Hapus 'active' dari semua tombol
                     document.querySelectorAll('.navbar-btn[data-page]').forEach(b => b.classList.remove('active'));
 
@@ -115,5 +120,6 @@
             });
         });
     </script>
+    @stack('scripts')
 </body>
 </html>

@@ -26,4 +26,20 @@ class ProductController extends Controller
             'barcode' => $product->barcode,
         ]);
     }
+
+    public function getProduct($id)
+    {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Produk tidak ditemukan.'], 404);
+        }
+
+        return response()->json([
+            'id' => $product->id,
+            'nama_produk' => $product->nama_produk,
+            'harga' => $product->jual,
+            'barcode' => $product->barcode,
+        ]);
+    }
 }
