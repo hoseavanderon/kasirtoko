@@ -127,18 +127,19 @@
                     <div class="text-center border rounded p-2 mb-2 bg-light fs-4 fw-bold" id="paid-display">Rp 0</div>
 
                     <!-- Quick Denominations -->
-                    <div class="d-flex flex-wrap justify-content-center mb-3" id="denominations">
-                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="1000">Rp 1.000</button>
-                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="2000">Rp 2.000</button>
-                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="5000">Rp 5.000</button>
-                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="10000">Rp 10.000</button>
-                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="20000">Rp 20.000</button>
-                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="50000">Rp 50.000</button>
-                        <button class="btn btn-outline-primary m-1 denomination-btn" data-amount="100000">Rp 100.000</button>
+                    <div class="row g-2">
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 1.000</button></div>
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 2.000</button></div>
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 5.000</button></div>
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 10.000</button></div>
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 20.000</button></div>
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 50.000</button></div>
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 100.000</button></div>
+                        <div class="col-6"><button class="btn btn-outline-primary w-100">Rp 200.000</button></div>
                     </div>
 
                     <!-- Custom Keypad -->
-                    <div class="keypad text-center">
+                    <div class="keypad text-center pt-3">
                         <div class="d-grid gap-2" style="grid-template-columns: repeat(3, 1fr); display: grid;">
                             <button class="btn btn-outline-dark keypad-btn">1</button>
                             <button class="btn btn-outline-dark keypad-btn">2</button>
@@ -428,15 +429,18 @@ function initPageScripts() {
             const itemEl = document.createElement('div');
             itemEl.className = 'cart-item mb-2';
             itemEl.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="fw-semibold">${item.nama_produk}</div>
+                <div class="d-flex justify-content-between align-items-center py-1">
+                    <!-- KIRI -->
+                    <div class="flex-grow-1 text-start">
+                        <span class="fw-semibold d-block">${item.nama_produk}</span>
                         <small class="text-muted">x${item.quantity}</small>
                     </div>
+
+                    <!-- KANAN -->
                     <div class="text-end">
-                        <div class="fw-bold">${formatRupiah(item.harga * item.quantity)}</div>
+                        <span class="fw-bold d-block">${formatRupiah(item.harga * item.quantity)}</span>
                         <button class="btn btn-sm btn-link text-danger p-0 remove-item-btn" data-id="${item.id}" title="Hapus item">
-                            <i class="bi bi-x-circle-fill fs-5"></i>
+                            <i class="bi bi-x-circle"></i>
                         </button>
                     </div>
                 </div>

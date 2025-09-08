@@ -94,10 +94,16 @@ body {
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
+#cart-items {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 .cart-item {
   border-bottom: 1px solid var(--border-color);
   padding: 15px 0;
   transition: all 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .cart-item:hover {
@@ -107,7 +113,7 @@ body {
 }
 
 .cart-item .d-flex {
-    flex-direction: column;
+    flex-direction: row;
 }
 
 .cart-item .text-end {
