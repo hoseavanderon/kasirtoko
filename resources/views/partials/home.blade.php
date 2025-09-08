@@ -370,7 +370,39 @@
 
             const barcode = document.getElementById('barcode-input').value.trim();
             if (!barcode) return;
+            processBarcode(barcode);
+            document.getElementById('barcode-input').value = '';
+        });
 
+        // Versi global listener: bisa scan tanpa harus fokus input
+        let barcodeBuffer = "";
+        let lastTime = Date.now();
+
+        document.addEventListener("keydown", function(e) {
+            const now = Date.now();
+
+            // reset buffer kalau jeda terlalu lama (scanner cepat sekali)
+            if (now - lastTime > 50) {
+                barcodeBuffer = "";
+            }
+
+            if (e.key === "Enter") {
+                if (barcodeBuffer.length > 0) {
+                    processBarcode(barcodeBuffer);
+                    barcodeBuffer = "";
+                }
+            } else {
+                // hanya angka/huruf yg valid, hindari key spesial
+                if (e.key.length === 1) {
+                    barcodeBuffer += e.key;
+                }
+            }
+
+            lastTime = now;
+        });
+
+        // Helper untuk memproses barcode
+        function processBarcode(barcode) {
             fetch("{{ route('products.searchByBarcode') }}", {
                 method: "POST",
                 headers: {
@@ -386,14 +418,13 @@
                 } else {
                     addToCart(data);
                     showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
-                    document.getElementById('barcode-input').value = '';
                 }
             })
             .catch(err => {
                 showAlert('Terjadi kesalahan saat mencari produk.', 'danger');
                 console.error(err);
             });
-        });
+        }
 
         // ====================== CLEAR CART ======================
         document.getElementById('clear-cart-btn').addEventListener('click', function () {
