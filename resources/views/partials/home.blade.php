@@ -1,5 +1,5 @@
 
-    <div class="col-lg-2 col-md-3">
+    <div class="col-lg-2 col-md-2">
         <div class="sidebar p-3">
             <h6 class="text-muted mb-3 fw-bold">Kategori Barang</h6>
             <div class="d-grid gap-2" id="categories-list">
@@ -36,7 +36,7 @@
     </div>
 
 
-    <div class="col-lg-7 col-md-6">
+    <div class="col-lg-7 col-md-5">
         <div class="p-4">
             <div class="mb-4">
                 <form id="barcode-form">
@@ -95,7 +95,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <div class="col-lg-3 col-md-3">
+    <div class="col-lg-3 col-md-5">
         <div class="cart-sidebar p-3">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0">Keranjang Belanja</h6>
