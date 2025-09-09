@@ -282,6 +282,11 @@
                 .catch(err => {
                     showAlert('Terjadi kesalahan saat mencari produk.', 'danger');
                     console.error(err);
+                })
+                .finally(() => {
+                    // Reset input & fokus ulang agar siap scan berikutnya
+                    barcodeInput.value = '';
+                    barcodeInput.focus();
                 });
             }
         }
