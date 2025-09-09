@@ -175,18 +175,18 @@
                 </div>
             </div>
 
-            <div class="row align-items-center mb-3 g-3">
-                <div class="col-auto">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="is_lunas" checked>
-                        <label class="form-check-label fw-bold" for="is_lunas">Lunas</label>
-                    </div>
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <!-- Kiri: Checkbox Lunas -->
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_lunas" checked>
+                    <label class="form-check-label fw-bold" for="is_lunas">Lunas</label>
                 </div>
 
-                <div class="col-auto d-flex align-items-center">
-                    <label class="fw-bold me-2 mb-0">Customer:</label>
-                    <span id="selected-customer-name" class="form-control bg-light" style="min-width:150px;">
-                    Belum dipilih
+                <!-- Kanan: Customer -->
+                <div class="d-flex flex-column" style="min-width:150px;">
+                    <label class="fw-bold mb-1">Customer:</label>
+                    <span id="selected-customer-name" class="form-control bg-light">
+                        Belum dipilih
                     </span>
                 </div>
             </div>
