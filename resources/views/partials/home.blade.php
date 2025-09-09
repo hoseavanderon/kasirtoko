@@ -175,19 +175,18 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <!-- Checkbox kiri -->
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="is_lunas" checked>
-                    <label class="form-check-label fw-bold" for="is_lunas">Lunas</label>
+            <div class="row align-items-center mb-3 g-3">
+                <div class="col-auto">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="is_lunas" checked>
+                        <label class="form-check-label fw-bold" for="is_lunas">Lunas</label>
+                    </div>
                 </div>
 
-                <!-- Customer kanan -->
-                <div class="d-flex align-items-center">
-                    <label class="fw-bold me-2">Customer:</label>
-                    <span id="selected-customer-name" class="form-control bg-light" 
-                        style="width:auto; min-width:150px;">
-                        Belum dipilih
+                <div class="col-auto d-flex align-items-center">
+                    <label class="fw-bold me-2 mb-0">Customer:</label>
+                    <span id="selected-customer-name" class="form-control bg-light" style="min-width:150px;">
+                    Belum dipilih
                     </span>
                 </div>
             </div>
@@ -216,6 +215,14 @@
         const changeDisplay = document.getElementById('change');
         const totalDisplay  = document.getElementById('total');
         const processBtn    = document.getElementById('process-payment-btn');
+        const barcodeInput = document.getElementById('barcode-input');
+
+        // Fokus awal
+        barcodeInput.focus();
+
+        // Fokus otomatis saat klik atau tekan tombol lain
+        document.addEventListener('click', () => barcodeInput.focus());
+        document.addEventListener('keydown', () => barcodeInput.focus());
 
         // ====================== UTILS (FORMAT & PARSE) ======================
         const formatNumberID = (n) => (n ?? 0).toLocaleString('id-ID');              
@@ -333,19 +340,42 @@
             }
 
             let subtotal = 0;
+            const reviewItems = document.getElementById("review-items");
             reviewItems.innerHTML = "";
-            
+
             items.forEach(item => {
                 let sub = item.harga * item.quantity;
                 subtotal += sub;
-                reviewItems.innerHTML += `
-                    <tr>
-                        <td>${item.nama_produk || item.name}</td>
-                        <td>${item.quantity || item.qty}</td>
-                        <td>${formatRupiah(item.harga)}</td>
-                        <td>${formatRupiah(sub)}</td>
-                    </tr>
-                `;
+
+                const row = document.createElement("div");
+                row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
+
+                // Kiri: nama produk + qty
+                const leftCol = document.createElement("div");
+                leftCol.style.display = "flex";
+                leftCol.style.flexDirection = "column";
+
+                const nameEl = document.createElement("span");
+                nameEl.textContent = item.nama_produk || item.name;
+                nameEl.style.fontWeight = "500";
+
+                const qtyEl = document.createElement("span");
+                qtyEl.textContent = `${item.quantity || item.qty}x`;
+                qtyEl.style.fontSize = "0.85rem";
+                qtyEl.style.color = "#6c757d";
+
+                leftCol.appendChild(nameEl);
+                leftCol.appendChild(qtyEl);
+
+                // Kanan: harga
+                const rightCol = document.createElement("span");
+                rightCol.textContent = formatRupiah(sub);
+                rightCol.style.fontWeight = "500";
+
+                row.appendChild(leftCol);
+                row.appendChild(rightCol);
+
+                reviewItems.appendChild(row);
             });
 
             let dibayar = paidAmount || subtotal;
@@ -557,17 +587,28 @@
 
         document.addEventListener("keydown", function(e) {
             const now = Date.now();
-            if (now - lastTime > 50) {
+
+            // Jika terlalu lambat, reset buffer
+            if (now - lastTime > 100) { // 50ms → 100ms agar lebih aman
                 barcodeBuffer = "";
             }
+
+            // Hanya tangkap tombol scanner ketika input barcode aktif
+            if (document.activeElement !== barcodeInput) {
+                lastTime = now;
+                return;
+            }
+
             if (e.key === "Enter") {
-                if (barcodeBuffer.length > 0) {
+                if (barcodeBuffer.length > 3) { // minimal panjang barcode
                     processBarcode(barcodeBuffer);
-                    barcodeBuffer = "";
                 }
+                barcodeBuffer = "";
+                e.preventDefault(); // cegah Enter memicu tombol lain
             } else {
                 if (e.key.length === 1) barcodeBuffer += e.key;
             }
+
             lastTime = now;
         });
 

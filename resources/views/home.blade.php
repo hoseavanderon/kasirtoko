@@ -6,66 +6,64 @@
 
 @section('modals')
 <div class="modal fade" id="reviewModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:400px;">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">Review Transaksi</h5>
-        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Produk</th>
-              <th>Qty</th>
-              <th>Harga</th>
-              <th>Subtotal</th>
-            </tr>
-          </thead>
-          <tbody id="review-items"></tbody>
-        </table>
 
-        <div class="d-flex justify-content-between mt-3">
-          <span class="fw-bold">Subtotal:</span>
-          <span class="fw-bold" id="review-subtotal">Rp0</span>
+      <div class="modal-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3 px">
+          <h5 class="m-0">Review Transaksi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(0);"></button>
         </div>
-        <div class="d-flex justify-content-between">
-          <span class="fw-bold">Dibayar:</span>
-          <span class="fw-bold" id="review-paid">Rp0</span>
-        </div>
-        <div class="d-flex justify-content-between">
-          <span class="fw-bold">Kembalian:</span>
-          <span class="fw-bold" id="review-change">Rp0</span>
+
+        <div id="review-items" class="mb-3 px-2"></div>
+
+        <hr class="my-2">
+
+        <div class="px-2">
+          <div class="d-flex justify-content-between" style="font-size: 1rem; font-weight: 400;">
+            <span>Subtotal</span>
+            <span id="review-subtotal">Rp0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2" style="font-size: 1rem; font-weight: 400;">
+            <span>Dibayar</span>
+            <span id="review-paid">Rp0</span>
+          </div>
+          <div class="d-flex justify-content-between fw-bold" style="font-size: 1.25rem;">
+            <span>Kembalian</span>
+            <span id="review-change">Rp0</span>
+          </div>
         </div>
       </div>
+
       <div class="modal-footer">
-        <button class="btn btn-success" id="confirm-payment-btn">
-          Konfirmasi Bayar
-        </button>
+        <button class="btn btn-success w-100" id="confirm-payment-btn">Konfirmasi Bayar</button>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal fade" id="successModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content text-center p-4">
       <div class="mb-3">
         <i class="bi bi-check-circle-fill text-success" style="font-size:4rem;"></i>
       </div>
       <h4 class="fw-bold mb-4">Transaksi Berhasil !!</h4>
 
-      <div class="d-flex justify-content-between mb-2">
-        <span class="fw-bold">Subtotal:</span>
-        <span class="fw-bold" id="success-subtotal">Rp0</span>
-      </div>
-      <div class="d-flex justify-content-between mb-2">
-        <span class="fw-bold">Total:</span>
-        <span class="fw-bold" id="success-total">Rp0</span>
-      </div>
-      <div class="d-flex justify-content-between fs-4 mt-3">
-        <span class="fw-bold">Kembalian:</span>
-        <span class="fw-bold text-success" id="success-change">Rp0</span>
+      <div class="px-3">
+        <div class="d-flex justify-content-between mb-1" style="font-weight: 400; font-size: 1rem;">
+          <span>Subtotal</span>
+          <span id="success-subtotal">Rp0</span>
+        </div>
+        <div class="d-flex justify-content-between mb-1" style="font-weight: 400; font-size: 1rem;">
+          <span>Total</span>
+          <span id="success-total">Rp0</span>
+        </div>
+        <div class="d-flex justify-content-between fw-bold" style="font-size: 1.25rem; color: #000;">
+          <span>Kembalian</span>
+          <span id="success-change">Rp0</span>
+        </div>
       </div>
 
       <div class="mt-4">
