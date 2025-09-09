@@ -4,7 +4,6 @@
         <div class="d-grid gap-2" id="categories-list">
             @foreach ($categories as $category)
                 <div class="mb-2">
-                    <!-- Tombol kategori -->
                     <button type="button"
                         class="category-item w-100 text-start fw-bold"
                         data-bs-toggle="collapse"
@@ -15,9 +14,7 @@
                         {{ $category->nama }}
                     </button>
 
-                    <!-- Subkategori yang collapsible -->
                     <div class="collapse ms-2 mt-1" id="collapse-{{ $category->id }}">
-                        <!-- Subkategori -->
                         @foreach ($category->subcategories as $sub)
                             <button type="button"
                                 class="category-item w-100 text-start subcategory-btn"
@@ -67,7 +64,7 @@
                 <div class="col-lg-4 col-md-4 col-sm-6">
                     <div class="product-card fade-in" data-product-id="{{ $product->id }}">
                         <div class="product-image">
-                            <i class="bi bi-box-seam"></i> {{-- kamu bisa ganti dengan gambar produk --}}
+                            <i class="bi bi-box-seam"></i>
                         </div>
                         <div class="card-body p-3">
                             <h6 class="card-title mb-2 fw-semibold text-truncate">{{ $product->nama_produk }}</h6>
@@ -120,7 +117,6 @@
                 <span class="fw-bold text-primary fs-5" id="total">Rp 0</span>
             </div>
 
-            <!-- Payment Input + Quick Denominations + Custom Keypad -->
             <div class="mb-3">
                 <label class="form-label fw-bold">Total Bayar</label>
                 <div class="text-center border rounded p-2 mb-2 bg-light fs-4 fw-bold" id="paid-display">Rp 0</div>
@@ -179,6 +175,23 @@
                 </div>
             </div>
 
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Checkbox kiri -->
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="is_lunas" checked>
+                    <label class="form-check-label fw-bold" for="is_lunas">Lunas</label>
+                </div>
+
+                <!-- Customer kanan -->
+                <div class="d-flex align-items-center">
+                    <label class="fw-bold me-2">Customer:</label>
+                    <span id="selected-customer-name" class="form-control bg-light" 
+                        style="width:auto; min-width:150px;">
+                        Belum dipilih
+                    </span>
+                </div>
+            </div>
+
             <div class="d-grid gap-2">
                 <button class="btn btn-primary btn-lg" id="process-payment-btn" disabled>
                     <i class="bi bi-credit-card me-2"></i>
@@ -189,55 +202,14 @@
     </div>
 </div>
     
-<div class="modal fade" id="successModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
-                    <i class="bi bi-check-circle me-2"></i>
-                    Payment Successful!
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center py-4">
-                <div class="mb-4">
-                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                </div>
-                <h6 class="mb-3">Transaction has been processed successfully.</h6>
-                <div class="bg-light p-3 rounded mb-3" id="transaction-details">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Total Amount:</span>
-                        <span class="fw-bold" id="summary-total">Rp0</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Paid:</span>
-                        <span class="fw-bold" id="summary-paid">Rp0</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span>Kembalian :</span>
-                        <span class="fw-bold" id="summary-change">Rp0</span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal">
-                    <i class="bi bi-printer me-2"></i>
-                    Print Receipt
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                    Continue
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @push('scripts')
 <script>
     function initPageScripts() {
         // ====================== STATE ======================
         let cartItems   = {};
         let paidAmount  = 0;
+
+        const routeSaveTransaction = "{{ route('transactions.save') }}";
 
         // ====================== ELEMENTS ======================
         const paidDisplay   = document.getElementById('paid-display');
@@ -246,8 +218,8 @@
         const processBtn    = document.getElementById('process-payment-btn');
 
         // ====================== UTILS (FORMAT & PARSE) ======================
-        const formatNumberID = (n) => (n ?? 0).toLocaleString('id-ID');              // 12.345
-        const formatRupiah   = (n) => `Rp ${formatNumberID(n)}`;                      // Rp 12.345
+        const formatNumberID = (n) => (n ?? 0).toLocaleString('id-ID');              
+        const formatRupiah   = (n) => `Rp ${formatNumberID(n)}`;                      
         const parseRupiah    = (s) => parseInt((s || '').toString().replace(/[^0-9]/g, ''), 10) || 0;
 
         function getCartTotal() {
@@ -261,8 +233,8 @@
         const exactBtn = document.getElementById('exact-btn');
         if (exactBtn) {
             exactBtn.addEventListener('click', () => {
-                paidAmount = getCartTotal(); // isi state paidAmount
-                updateDisplays();            // refresh tampilan
+                paidAmount = getCartTotal();
+                updateDisplays();
             });
         }
 
@@ -280,7 +252,6 @@
                     renderCartItems();
                     updateCartTotals();
                 } else if (action === 'decrease') {
-                    // jika qty akan menjadi 0, konfirmasi hapus
                     if (cartItems[id].quantity <= 1) {
                         Swal.fire({
                             title: 'Hapus Produk?',
@@ -297,7 +268,7 @@
                                 renderCartItems();
                                 updateCartTotals();
                                 if (Object.keys(cartItems).length === 0) {
-                                    paidAmount = 0;      // reset juga kalau sudah tidak ada produk
+                                    paidAmount = 0;
                                     updateDisplays();
                                 }
                                 showAlert('Produk dihapus!', 'success');
@@ -330,10 +301,218 @@
                         renderCartItems();
                         updateCartTotals();
                         if (Object.keys(cartItems).length === 0) {
-                            paidAmount = 0;      // reset juga kalau sudah tidak ada produk
+                            paidAmount = 0;
                             updateDisplays();
                         }
                         showAlert('Produk dihapus!', 'success');
+                    }
+                });
+            }
+        });
+
+        // ====================== BAYAR ======================
+        const reviewModalEl   = document.getElementById("reviewModal");
+        // === FIX MODAL: overlay tidak hilang ===
+        const reviewModal     = new bootstrap.Modal(reviewModalEl, { backdrop: 'static', keyboard: false });
+        const successModal    = new bootstrap.Modal(document.getElementById("successModal"), { backdrop: 'static', keyboard: false });
+
+        const reviewItems     = document.getElementById("review-items");
+        const reviewSubtotal  = document.getElementById("review-subtotal");
+        const reviewPaid      = document.getElementById("review-paid");
+        const reviewChange    = document.getElementById("review-change");
+
+        const successSubtotal = document.getElementById("success-subtotal");
+        const successTotal    = document.getElementById("success-total");
+        const successChange   = document.getElementById("success-change");
+
+        document.getElementById("process-payment-btn").addEventListener("click", () => {
+            const items = Object.values(cartItems);
+            if(items.length === 0){
+                Swal.fire({ icon: 'warning', text: 'Keranjang kosong!', timer: 1500, showConfirmButton:false });
+                return;
+            }
+
+            let subtotal = 0;
+            reviewItems.innerHTML = "";
+            
+            items.forEach(item => {
+                let sub = item.harga * item.quantity;
+                subtotal += sub;
+                reviewItems.innerHTML += `
+                    <tr>
+                        <td>${item.nama_produk || item.name}</td>
+                        <td>${item.quantity || item.qty}</td>
+                        <td>${formatRupiah(item.harga)}</td>
+                        <td>${formatRupiah(sub)}</td>
+                    </tr>
+                `;
+            });
+
+            let dibayar = paidAmount || subtotal;
+            let kembalian = dibayar - subtotal;
+
+            reviewSubtotal.textContent = formatRupiah(subtotal);
+            reviewPaid.textContent     = formatRupiah(dibayar);
+            reviewChange.textContent   = formatRupiah(kembalian);
+
+            reviewModalEl._subtotal   = subtotal;
+            reviewModalEl._dibayar    = dibayar;
+            reviewModalEl._kembalian  = kembalian;
+
+            reviewModal.show();
+        });
+
+        document.getElementById("confirm-payment-btn").addEventListener("click", () => {
+            const subtotal   = reviewModalEl._subtotal;
+            const dibayar    = reviewModalEl._dibayar;
+            const kembalian  = reviewModalEl._kembalian;
+            const items      = Object.values(cartItems);
+
+           fetch(routeSaveTransaction, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    subtotal: subtotal,
+                    dibayar: dibayar,
+                    kembalian: kembalian,
+                    items: items,
+                    is_lunas: document.getElementById('is_lunas').checked ? 1 : 0,
+                    customer_id: document.getElementById('selected-customer-id')?.value || null,
+                })      
+            })
+            .then(async res => {
+                const text = await res.text();
+                try {
+                    const data = JSON.parse(text);
+                    reviewModal.hide();
+
+                    if(data.success){
+                        successSubtotal.textContent = formatRupiah(subtotal);
+                        successTotal.textContent    = formatRupiah(subtotal);
+                        successChange.textContent   = formatRupiah(kembalian);
+
+                        successModal.show();
+
+                        cartItems = {};
+                        renderCartItems();
+                        updateCartTotals();
+                        paidAmount = 0;
+                        updateDisplays();
+                    } else {
+                        Swal.fire({ icon:'error', text: 'Gagal simpan transaksi!' });
+                    }
+                } catch (err) {
+                    console.error("JSON parse error:", err);
+                    Swal.fire({ icon:'error', text: 'Server mengembalikan HTML/response tidak valid!' });
+                }
+            })
+            .catch(err => {
+                console.error("Fetch error:", err);
+                Swal.fire({ icon:'error', text: 'Terjadi kesalahan!' });
+            });
+        });
+
+        // ====================== UTANG ======================
+        const isLunasCheckbox = document.getElementById("is_lunas");
+
+        isLunasCheckbox.addEventListener("change", function () {
+            if (!this.checked) {
+                Swal.fire({
+                    title: "Cari Customer",
+                    html: `
+                        <input type="text" id="search-customer" class="swal2-input" placeholder="Ketik nama customer...">
+                        <div id="customer-list" class="list-group mt-2" style="max-height:200px;overflow-y:auto;"></div>
+                    `,
+                    showConfirmButton: false,
+                    allowOutsideClick: true,
+                    allowEscapeKey: true,
+                    backdrop: true,
+                    didOpen: () => {
+                        const popup = Swal.getPopup();
+                        const input = popup.querySelector("#search-customer");
+                        const list  = popup.querySelector("#customer-list");
+
+                        input.focus();
+
+                        input.addEventListener("input", function () {
+                            let query = this.value;
+
+                            if (query.length < 2) {
+                                list.innerHTML = "<div class='text-muted text-center'>Ketik minimal 2 huruf...</div>";
+                                return;
+                            }
+
+                            fetch(`/search-customer?q=${query}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                    let html = "";
+                                    if (data.length > 0) {
+                                        data.forEach(c => {
+                                            html += `
+                                                <div class="list-group-item list-group-item-action customer-item" data-id="${c.id}">
+                                                    ${c.customer_name}
+                                                </div>`;
+                                        });
+                                        list.innerHTML = html;
+
+                                        list.querySelectorAll(".customer-item").forEach(item => {
+                                            item.addEventListener("click", function () {
+                                                let id   = this.getAttribute("data-id");
+                                                let name = this.textContent;
+
+                                                document.getElementById("selected-customer-id")?.remove();
+
+                                                let hidden = document.createElement("input");
+                                                hidden.type = "hidden";
+                                                hidden.name = "customer_id";
+                                                hidden.id   = "selected-customer-id";
+                                                hidden.value = id;
+                                                document.querySelector("form")?.appendChild(hidden);
+
+                                                document.getElementById("selected-customer-name").textContent = name;
+
+                                                Swal.close();
+
+                                                Swal.fire({
+                                                    icon: "success",
+                                                    title: "Customer dipilih",
+                                                    text: name,
+                                                    timer: 1500,
+                                                    showConfirmButton: false
+                                                });
+                                            });
+                                        });
+                                    } else {
+                                        list.innerHTML = "<div class='text-muted text-center'>Tidak ditemukan</div>";
+                                    }
+                                });
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: "Konfirmasi",
+                    text: "Apakah yakin customer dibersihkan dan transaksi dianggap tunai?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, hapus customer",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById("selected-customer-id")?.remove();
+                        document.getElementById("selected-customer-name").textContent = "Belum dipilih";
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Customer dihapus",
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        isLunasCheckbox.checked = false;
                     }
                 });
             }
@@ -367,41 +546,31 @@
         // ====================== BARCODE SCAN ======================
         document.getElementById('barcode-form').addEventListener('submit', function(e) {
             e.preventDefault();
-
             const barcode = document.getElementById('barcode-input').value.trim();
             if (!barcode) return;
             processBarcode(barcode);
             document.getElementById('barcode-input').value = '';
         });
 
-        // Versi global listener: bisa scan tanpa harus fokus input
         let barcodeBuffer = "";
         let lastTime = Date.now();
 
         document.addEventListener("keydown", function(e) {
             const now = Date.now();
-
-            // reset buffer kalau jeda terlalu lama (scanner cepat sekali)
             if (now - lastTime > 50) {
                 barcodeBuffer = "";
             }
-
             if (e.key === "Enter") {
                 if (barcodeBuffer.length > 0) {
                     processBarcode(barcodeBuffer);
                     barcodeBuffer = "";
                 }
             } else {
-                // hanya angka/huruf yg valid, hindari key spesial
-                if (e.key.length === 1) {
-                    barcodeBuffer += e.key;
-                }
+                if (e.key.length === 1) barcodeBuffer += e.key;
             }
-
             lastTime = now;
         });
 
-        // Helper untuk memproses barcode
         function processBarcode(barcode) {
             fetch("{{ route('products.searchByBarcode') }}", {
                 method: "POST",
@@ -443,7 +612,7 @@
                     renderCartItems();
                     updateCartTotals();
                     if (Object.keys(cartItems).length === 0) {
-                        paidAmount = 0;      // reset juga kalau sudah tidak ada produk
+                        paidAmount = 0;
                         updateDisplays();
                     }
                     showAlert('Keranjang dikosongkan!', 'success');
@@ -455,9 +624,7 @@
         document.getElementById('products-grid').addEventListener('click', function(e) {
             const card = e.target.closest('.product-card');
             if (!card) return;
-
             const productId = card.dataset.productId;
-
             fetch(`/products/get/${productId}`)
                 .then(response => response.json())
                 .then(product => {
@@ -481,17 +648,12 @@
 
         function updateDisplays() {
             paidDisplay.textContent = formatRupiah(paidAmount);
-
             const totalAmount = getTotalAmount();
             const change = paidAmount - totalAmount;
-
             changeDisplay.textContent = formatRupiah(Math.max(change, 0));
-
-            // enable/disable Process Payment
             processBtn.disabled = (totalAmount === 0) || (paidAmount < totalAmount);
         }
 
-        // Quick denominations (PASTIKAN tidak ada handler lama addDenomination)
         document.querySelectorAll('.denomination-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 paidAmount += parseInt(btn.dataset.amount, 10) || 0;
@@ -499,7 +661,6 @@
             });
         });
 
-        // Numpad custom
         document.querySelectorAll('.keypad-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const val = btn.textContent.trim();
@@ -515,11 +676,9 @@
         // ====================== ALERT HELPER ======================
         function showAlert(message, type = 'success') {
             let icon = 'success';
-
             if (type === 'danger') icon = 'error';
             else if (type === 'warning') icon = 'warning';
             else if (type === 'info') icon = 'info';
-
             Swal.fire({
                 text: message,
                 icon: icon,
@@ -538,6 +697,7 @@
             } else {
                 cartItems[product.id] = {
                     ...product,
+                    harga: parseInt(product.harga, 10) || 0,
                     quantity: 1
                 };
             }
@@ -547,29 +707,20 @@
 
         function renderCartItems() {
             const cartContainer = document.getElementById('cart-items');
-
-            // Reset container
             cartContainer.innerHTML = `
                 <div class="text-center py-4 text-muted" id="empty-cart">
                     <i class="bi bi-cart-x fs-1"></i>
                     <p class="mt-2">Keranjang Kosong</p>
                 </div>
             `;
-
             const items = Object.values(cartItems);
             if (items.length === 0) return;
-
-            // Hapus "Keranjang Kosong"
-            const emptyCart = document.getElementById('empty-cart');
-            if (emptyCart) emptyCart.remove();
-
-            // Render items
+            document.getElementById('empty-cart')?.remove();
             items.forEach(item => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'cart-item mb-2';
                 itemEl.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center py-1">
-                        <!-- KIRI -->
                         <div class="flex-grow-1 text-start">
                             <span class="fw-semibold d-block">${item.nama_produk}</span>
                             <div class="d-flex align-items-center gap-1">
@@ -578,10 +729,17 @@
                                 <button class="btn btn-sm btn-outline-secondary qty-btn" data-id="${item.id}" data-action="increase">+</button>
                             </div>
                         </div>
-
-                        <!-- KANAN -->
                         <div class="text-end">
-                            <span class="fw-bold d-block">${formatRupiah(item.harga * item.quantity)}</span>
+                            <div class="d-flex align-items-center gap-1">
+                                <input type="text" 
+                                    class="form-control form-control-sm price-input" 
+                                    data-id="${item.id}" 
+                                    value="${formatRupiah(item.harga)}" 
+                                    style="width:100px;text-align:right;">
+                                <span class="fw-bold ms-2 subtotal-display" data-id="${item.id}">
+                                    ${formatRupiah(item.harga * item.quantity)}
+                                </span>
+                            </div>
                             <button class="btn btn-sm btn-link text-danger p-0 remove-item-btn" data-id="${item.id}" title="Hapus item">
                                 <i class="bi bi-x-circle"></i>
                             </button>
@@ -591,33 +749,27 @@
                 cartContainer.appendChild(itemEl);
             });
 
-            // Remove item handlers
-            document.querySelectorAll('.remove-item-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
+            document.querySelectorAll('.price-input').forEach(input => {
+                input.addEventListener('input', function () {
                     const id = this.dataset.id;
-
-                    Swal.fire({
-                        title: 'Hapus Produk Ini?',
-                        text: "Produk akan dihapus dari keranjang.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Ya, hapus!',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            delete cartItems[id];
-                            renderCartItems();
-                            updateCartTotals();
-                            if (Object.keys(cartItems).length === 0) {
-                                paidAmount = 0;      // reset juga kalau sudah tidak ada produk
-                                updateDisplays();
-                            }
-                            showAlert('Produk dihapus!', 'success');
-                        }
-                    });
+                    const newPrice = parseRupiah(this.value);
+                    if (cartItems[id]) {
+                        cartItems[id].harga = newPrice;
+                        const subtotalEl = document.querySelector(`.subtotal-display[data-id="${id}"]`);
+                        subtotalEl.textContent = formatRupiah(cartItems[id].harga * cartItems[id].quantity);
+                        updateCartTotals();
+                    }
+                    this.value = formatRupiah(newPrice);
                 });
+                input.addEventListener('focus', function () {
+                    this.value = parseRupiah(this.value);
+                });
+                input.addEventListener('blur', function () {
+                    this.value = formatRupiah(parseRupiah(this.value));
+                });
+            });
+            document.querySelectorAll('.price-input').forEach(input => {
+                input.value = formatRupiah(parseRupiah(input.value));
             });
         }
 
@@ -626,11 +778,8 @@
             Object.values(cartItems).forEach(item => {
                 total += (item.harga * item.quantity);
             });
-
             document.getElementById('subtotal').innerText = formatRupiah(total);
             document.getElementById('total').innerText    = formatRupiah(total);
-
-            // Setelah total berubah, update kembalian & tombol payment
             updateDisplays();
         }
 

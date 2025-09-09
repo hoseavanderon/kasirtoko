@@ -1,6 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Transaction;
+use App\Models\DetailTransaction;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\SubCategory;
@@ -50,4 +54,33 @@ class HomeController extends Controller
         ]);
     }
 
+   public function saveTransaction(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            $nota = Transaction::generateNota();
+
+            $transaction = Transaction::create([
+                'nomor_nota' => $nota,
+                'subtotal'   => $request->subtotal,
+                'dibayar'    => $request->dibayar,
+                'kembalian'  => $request->kembalian,
+                'user_id'    => Auth::id(),
+                'is_lunas'   => $request->is_lunas ? 1 : 0,
+                'customer_id'=> $request->customer_id,
+                'paid_at'    => now(),
+            ]);
+
+            foreach ($request->items as $item) {
+                DetailTransaction::create([
+                    'transaction_id' => $transaction->id,
+                    'product_id'     => $item['id'],
+                    'qty'            => $item['quantity'],
+                    'harga_satuan'   => $item['harga'],
+                    'subtotal'       => $item['harga'] * $item['quantity'],
+                ]);
+            }
+        });
+
+        return response()->json(['success' => true]);
+    }
 }
