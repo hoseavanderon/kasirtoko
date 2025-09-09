@@ -637,43 +637,6 @@
             });
         });
 
-        // ====================== BARCODE SCAN ======================
-        document.getElementById('barcode-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const barcode = document.getElementById('barcode-input').value.trim();
-            if (!barcode) return;
-            processBarcode(barcode);
-            document.getElementById('barcode-input').value = '';
-        });
-
-        let barcodeBuffer = "";
-        let lastTime = Date.now();
-
-        document.addEventListener("keydown", function(e) {
-            const now = Date.now();
-
-            if (now - lastTime > 100) {
-                barcodeBuffer = "";
-            }
-
-            if (document.activeElement !== barcodeInput) {
-                lastTime = now;
-                return;
-            }
-
-            if (e.key === "Enter") {
-                if (barcodeBuffer.length > 3) {
-                    processBarcode(barcodeBuffer);
-                }
-                barcodeBuffer = "";
-                e.preventDefault();
-            } else {
-                if (e.key.length === 1) barcodeBuffer += e.key;
-            }
-
-            lastTime = now;
-        });
-
         // ====================== CLEAR CART ======================
         document.getElementById('clear-cart-btn').addEventListener('click', function () {
             Swal.fire({
