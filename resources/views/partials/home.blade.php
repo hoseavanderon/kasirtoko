@@ -386,7 +386,6 @@
 
         // ====================== BAYAR ======================
         const reviewModalEl   = document.getElementById("reviewModal");
-        // === FIX MODAL: overlay tidak hilang ===
         const reviewModal     = new bootstrap.Modal(reviewModalEl, { backdrop: 'static', keyboard: false });
         const successModal    = new bootstrap.Modal(document.getElementById("successModal"), { backdrop: 'static', keyboard: false });
 
@@ -417,7 +416,6 @@
                 const row = document.createElement("div");
                 row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
 
-                // Kiri: nama produk + qty
                 const leftCol = document.createElement("div");
                 leftCol.style.display = "flex";
                 leftCol.style.flexDirection = "column";
@@ -434,7 +432,6 @@
                 leftCol.appendChild(nameEl);
                 leftCol.appendChild(qtyEl);
 
-                // Kanan: harga
                 const rightCol = document.createElement("span");
                 rightCol.textContent = formatRupiah(sub);
                 rightCol.style.fontWeight = "500";
@@ -655,23 +652,21 @@
         document.addEventListener("keydown", function(e) {
             const now = Date.now();
 
-            // Jika terlalu lambat, reset buffer
-            if (now - lastTime > 100) { // 50ms → 100ms agar lebih aman
+            if (now - lastTime > 100) {
                 barcodeBuffer = "";
             }
 
-            // Hanya tangkap tombol scanner ketika input barcode aktif
             if (document.activeElement !== barcodeInput) {
                 lastTime = now;
                 return;
             }
 
             if (e.key === "Enter") {
-                if (barcodeBuffer.length > 3) { // minimal panjang barcode
+                if (barcodeBuffer.length > 3) {
                     processBarcode(barcodeBuffer);
                 }
                 barcodeBuffer = "";
-                e.preventDefault(); // cegah Enter memicu tombol lain
+                e.preventDefault();
             } else {
                 if (e.key.length === 1) barcodeBuffer += e.key;
             }
@@ -751,126 +746,55 @@
                 if (btn.id === "backspace") {
                     paidAmount = Math.floor(paidAmount / 10);
                 } else {
-                    paidAmount = parseInt(`${paidAmount}${val}`, 10) || 0;
+                    paidAmount = parseInt("" + paidAmount + val, 10);
                 }
                 updateDisplays();
             });
         });
 
-        // ====================== ALERT HELPER ======================
-        function showAlert(message, type = 'success') {
-            let icon = 'success';
-            if (type === 'danger') icon = 'error';
-            else if (type === 'warning') icon = 'warning';
-            else if (type === 'info') icon = 'info';
-            Swal.fire({
-                text: message,
-                icon: icon,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true
-            });
-        }
-
-        // ====================== CART ======================
         function addToCart(product) {
-            if (cartItems[product.id]) {
-                cartItems[product.id].quantity += 1;
+            const id = product.id;
+            if (cartItems[id]) {
+                cartItems[id].quantity += 1;
             } else {
-                cartItems[product.id] = {
-                    ...product,
-                    harga: parseInt(product.harga, 10) || 0,
-                    quantity: 1
-                };
+                cartItems[id] = { ...product, quantity: 1 };
             }
             renderCartItems();
             updateCartTotals();
         }
 
         function renderCartItems() {
-            const cartContainer = document.getElementById('cart-items');
-            cartContainer.innerHTML = `
-                <div class="text-center py-4 text-muted" id="empty-cart">
-                    <i class="bi bi-cart-x fs-1"></i>
-                    <p class="mt-2">Keranjang Kosong</p>
-                </div>
-            `;
-            const items = Object.values(cartItems);
-            if (items.length === 0) return;
-            document.getElementById('empty-cart')?.remove();
-            items.forEach(item => {
-                const itemEl = document.createElement('div');
-                itemEl.className = 'cart-item mb-2';
-                itemEl.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center py-1">
-                        <div class="flex-grow-1 text-start">
-                            <span class="fw-semibold d-block">${item.nama_produk}</span>
-                            <div class="d-flex align-items-center gap-1">
-                                <button class="btn btn-sm btn-outline-secondary qty-btn" data-id="${item.id}" data-action="decrease">−</button>
-                                <span class="mx-1">${item.quantity}</span>
-                                <button class="btn btn-sm btn-outline-secondary qty-btn" data-id="${item.id}" data-action="increase">+</button>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <div class="d-flex align-items-center gap-1">
-                                <input type="text" 
-                                    class="form-control form-control-sm price-input" 
-                                    data-id="${item.id}" 
-                                    value="${formatRupiah(item.harga)}" 
-                                    style="width:100px;text-align:right;">
-                                <span class="fw-bold ms-2 subtotal-display" data-id="${item.id}">
-                                    ${formatRupiah(item.harga * item.quantity)}
-                                </span>
-                            </div>
-                            <button class="btn btn-sm btn-link text-danger p-0 remove-item-btn" data-id="${item.id}" title="Hapus item">
-                                <i class="bi bi-x-circle"></i>
-                            </button>
-                        </div>
+            const container = document.getElementById('cart-items');
+            container.innerHTML = "";
+            Object.values(cartItems).forEach(item => {
+                const row = document.createElement('div');
+                row.className = "cart-item d-flex justify-content-between align-items-center mb-2";
+                row.innerHTML = `
+                    <div>
+                        <strong>${item.name || item.nama_produk}</strong> <br>
+                        <small>${item.quantity}x</small>
+                    </div>
+                    <div>
+                        ${formatRupiah(item.harga * item.quantity)}
+                        <button class="btn btn-sm btn-outline-danger remove-item-btn" data-id="${item.id}">×</button>
                     </div>
                 `;
-                cartContainer.appendChild(itemEl);
-            });
-
-            document.querySelectorAll('.price-input').forEach(input => {
-                input.addEventListener('input', function () {
-                    const id = this.dataset.id;
-                    const newPrice = parseRupiah(this.value);
-                    if (cartItems[id]) {
-                        cartItems[id].harga = newPrice;
-                        const subtotalEl = document.querySelector(`.subtotal-display[data-id="${id}"]`);
-                        subtotalEl.textContent = formatRupiah(cartItems[id].harga * cartItems[id].quantity);
-                        updateCartTotals();
-                    }
-                    this.value = formatRupiah(newPrice);
-                });
-                input.addEventListener('focus', function () {
-                    this.value = parseRupiah(this.value);
-                });
-                input.addEventListener('blur', function () {
-                    this.value = formatRupiah(parseRupiah(this.value));
-                });
-            });
-            document.querySelectorAll('.price-input').forEach(input => {
-                input.value = formatRupiah(parseRupiah(input.value));
+                container.appendChild(row);
             });
         }
 
         function updateCartTotals() {
-            let total = 0;
-            Object.values(cartItems).forEach(item => {
-                total += (item.harga * item.quantity);
-            });
-            document.getElementById('subtotal').innerText = formatRupiah(total);
-            document.getElementById('total').innerText    = formatRupiah(total);
+            const total = getCartTotal();
+            totalDisplay.textContent = formatRupiah(total);
             updateDisplays();
         }
 
-        // ====================== INIT ======================
-        updateDisplays();
+        function showAlert(msg, type='success') {
+            Swal.fire({ toast:true, position:'top-end', icon:type, title:msg, showConfirmButton:false, timer:1200 });
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', initPageScripts);
+    document.addEventListener("DOMContentLoaded", initPageScripts);
 </script>
 @endpush
+
