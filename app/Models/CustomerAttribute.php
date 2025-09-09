@@ -6,21 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Customer extends Model
+class CustomerAttribute extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'customer_name',
+        'customer_id',
+        'attribute',
+        'attribute_value',
+        'attribute_notes',
     ];
 
-    public function transactions()
+    public function customer()
     {
-        return $this->hasMany(Transaction::class);
-    }
-
-    public function attributes()
-    {
-        return $this->hasMany(CustomerAttribute::class);
+        return $this->belongsTo(Customer::class);
     }
 }

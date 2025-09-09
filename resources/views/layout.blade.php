@@ -44,8 +44,8 @@
                                     <i class="bi bi-house-door"></i>
                                 </button>
 
-                                <button class="navbar-btn" title="Daily Transaction Summary" data-page="daily-summary">
-                                    <i class="bi bi-graph-up"></i>
+                                <button class="navbar-btn" title="Transaction History" data-page="history">
+                                    <i class="bi bi-clock-history"></i>
                                 </button>
                                 <!-- dst -->
                             </div>

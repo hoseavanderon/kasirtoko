@@ -215,14 +215,77 @@
         const changeDisplay = document.getElementById('change');
         const totalDisplay  = document.getElementById('total');
         const processBtn    = document.getElementById('process-payment-btn');
+
         const barcodeInput = document.getElementById('barcode-input');
+        const barcodeForm = document.getElementById('barcode-form');
 
-        // Fokus awal
-        barcodeInput.focus();
+        // Hanya jalankan jika elemen ada
+        if (barcodeInput && barcodeForm) {
+            barcodeInput.focus();
 
-        // Fokus otomatis saat klik atau tekan tombol lain
-        document.addEventListener('click', () => barcodeInput.focus());
-        document.addEventListener('keydown', () => barcodeInput.focus());
+            // ====================== BARCODE SCAN ======================
+            barcodeForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const barcode = barcodeInput.value.trim();
+                if (!barcode) return;
+                processBarcode(barcode);
+                barcodeInput.value = '';
+            });
+
+            let barcodeBuffer = "";
+            let lastTime = Date.now();
+
+            document.addEventListener("keydown", function(e) {
+                const now = Date.now();
+
+                if (now - lastTime > 100) {
+                    barcodeBuffer = "";
+                }
+
+                // Hanya proses ketika input aktif
+                if (document.activeElement !== barcodeInput) {
+                    lastTime = now;
+                    return;
+                }
+
+                if (e.key === "Enter") {
+                    if (barcodeBuffer.length > 3) {
+                        processBarcode(barcodeBuffer);
+                    }
+                    barcodeBuffer = "";
+                    e.preventDefault();
+                } else {
+                    if (e.key.length === 1) barcodeBuffer += e.key;
+                }
+
+                lastTime = now;
+            });
+
+            function processBarcode(barcode) {
+                fetch("{{ route('products.searchByBarcode') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({ barcode }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert(data.error, 'danger');
+                    } else {
+                        addToCart(data);
+                        showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
+                    }
+                })
+                .catch(err => {
+                    showAlert('Terjadi kesalahan saat mencari produk.', 'danger');
+                    console.error(err);
+                });
+            }
+        }
+
 
         // ====================== UTILS (FORMAT & PARSE) ======================
         const formatNumberID = (n) => (n ?? 0).toLocaleString('id-ID');              
@@ -246,10 +309,12 @@
         }
 
         // Event delegation untuk tombol +/- dan hapus
+        let lastManualClick = 0;
         const cartContainer = document.getElementById('cart-items');
         cartContainer.addEventListener('click', function(e) {
+            lastManualClick = Date.now();
             const qtyBtn = e.target.closest('.qty-btn');
-            if (qtyBtn) {
+            if (qtyBtn && qtyBtn.dataset.id && cartItems[qtyBtn.dataset.id]) {
                 const id = qtyBtn.dataset.id;
                 const action = qtyBtn.dataset.action;
                 if (!cartItems[id]) return;
@@ -291,7 +356,7 @@
             }
 
             const rmBtn = e.target.closest('.remove-item-btn');
-            if (rmBtn) {
+            if (rmBtn && rmBtn.dataset.id && cartItems[rmBtn.dataset.id]) {
                 const id = rmBtn.dataset.id;
                 Swal.fire({
                     title: 'Hapus Produk Ini?',
@@ -316,6 +381,8 @@
                 });
             }
         });
+
+        if (Date.now() - lastManualClick < 200) return;
 
         // ====================== BAYAR ======================
         const reviewModalEl   = document.getElementById("reviewModal");
@@ -611,30 +678,6 @@
 
             lastTime = now;
         });
-
-        function processBarcode(barcode) {
-            fetch("{{ route('products.searchByBarcode') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": '{{ csrf_token() }}',
-                },
-                body: JSON.stringify({ barcode }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showAlert(data.error, 'danger');
-                } else {
-                    addToCart(data);
-                    showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
-                }
-            })
-            .catch(err => {
-                showAlert('Terjadi kesalahan saat mencari produk.', 'danger');
-                console.error(err);
-            });
-        }
 
         // ====================== CLEAR CART ======================
         document.getElementById('clear-cart-btn').addEventListener('click', function () {

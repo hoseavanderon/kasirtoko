@@ -9,6 +9,10 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Section;
 
 class CustomerResource extends Resource
 {
@@ -21,10 +25,34 @@ class CustomerResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('customer_name')
+                TextInput::make('customer_name')
                     ->label('Nama Customer')
                     ->required()
                     ->maxLength(255),
+
+                Section::make('Atribut Customer')
+                    ->schema([
+                        Repeater::make('attributes') // harus sesuai nama relasi di model Customer
+                            ->relationship('attributes')
+                            ->schema([
+                                TextInput::make('attribute')
+                                    ->label('Atribut')
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('attribute_value')
+                                    ->label('Nomer nya')
+                                    ->required()
+                                    ->maxLength(255),
+                                Textarea::make('attribute_notes')
+                                    ->label('Catatan')
+                                    ->rows(2)
+                                    ->maxLength(500)
+                                    ->nullable(),
+                            ])
+                            ->collapsible()
+                            ->columns(1)
+                            ->createItemButtonLabel('Tambah Atribut'),
+                    ]),
             ]);
     }
 
@@ -34,7 +62,7 @@ class CustomerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('index')
                     ->label('No')
-                    ->rowIndex(), 
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('customer_name')
                     ->label('Nama Customer')
                     ->sortable()
