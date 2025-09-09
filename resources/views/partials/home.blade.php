@@ -287,77 +287,79 @@
         // Event delegation untuk tombol +/- dan hapus
         let lastManualClick = 0;
         const cartContainer = document.getElementById('cart-items');
-        cartContainer.addEventListener('click', function(e) {
-            if (Date.now() - lastManualClick < 200) return; // mencegah double click
-            lastManualClick = Date.now();
-            const qtyBtn = e.target.closest('.qty-btn');
-            if (qtyBtn && qtyBtn.dataset.id && cartItems[qtyBtn.dataset.id]) {
-                const id = qtyBtn.dataset.id;
-                const action = qtyBtn.dataset.action;
-                if (!cartItems[id]) return;
-
-                if (action === 'increase') {
-                    cartItems[id].quantity += 1;
-                    renderCartItems();
-                    updateCartTotals();
-                } else if (action === 'decrease') {
-                    if (cartItems[id].quantity <= 1) {
-                        Swal.fire({
-                            title: 'Hapus Produk?',
-                            text: 'Jumlah akan menjadi 0. Hapus produk dari keranjang?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#6c757d',
-                            confirmButtonText: 'Ya, hapus',
-                            cancelButtonText: 'Batal'
-                        }).then(result => {
-                            if (result.isConfirmed) {
-                                delete cartItems[id];
-                                renderCartItems();
-                                updateCartTotals();
-                                if (Object.keys(cartItems).length === 0) {
-                                    paidAmount = 0;
-                                    updateDisplays();
+        if (cartContainer) {
+            cartContainer.addEventListener('click', function(e) {
+                if (Date.now() - lastManualClick < 200) return; // mencegah double click
+                lastManualClick = Date.now();
+                const qtyBtn = e.target.closest('.qty-btn');
+                if (qtyBtn && qtyBtn.dataset.id && cartItems[qtyBtn.dataset.id]) {
+                    const id = qtyBtn.dataset.id;
+                    const action = qtyBtn.dataset.action;
+                    if (!cartItems[id]) return;
+    
+                    if (action === 'increase') {
+                        cartItems[id].quantity += 1;
+                        renderCartItems();
+                        updateCartTotals();
+                    } else if (action === 'decrease') {
+                        if (cartItems[id].quantity <= 1) {
+                            Swal.fire({
+                                title: 'Hapus Produk?',
+                                text: 'Jumlah akan menjadi 0. Hapus produk dari keranjang?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Ya, hapus',
+                                cancelButtonText: 'Batal'
+                            }).then(result => {
+                                if (result.isConfirmed) {
+                                    delete cartItems[id];
+                                    renderCartItems();
+                                    updateCartTotals();
+                                    if (Object.keys(cartItems).length === 0) {
+                                        paidAmount = 0;
+                                        updateDisplays();
+                                    }
+                                    showAlert('Produk dihapus!', 'success');
                                 }
-                                showAlert('Produk dihapus!', 'success');
-                            }
-                        });
-                    } else {
-                        cartItems[id].quantity -= 1;
-                        renderCartItems();
-                        updateCartTotals();
-                    }
-                }
-                return;
-            }
-
-            const rmBtn = e.target.closest('.remove-item-btn');
-            if (rmBtn && rmBtn.dataset.id && cartItems[rmBtn.dataset.id]) {
-                const id = rmBtn.dataset.id;
-                Swal.fire({
-                    title: 'Hapus Produk Ini?',
-                    text: "Produk akan dihapus dari keranjang.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        delete cartItems[id];
-                        renderCartItems();
-                        updateCartTotals();
-                        if (Object.keys(cartItems).length === 0) {
-                            paidAmount = 0;
-                            updateDisplays();
+                            });
+                        } else {
+                            cartItems[id].quantity -= 1;
+                            renderCartItems();
+                            updateCartTotals();
                         }
-                        showAlert('Produk dihapus!', 'success');
                     }
-                });
-            }
-        });
+                    return;
+                }
+    
+                const rmBtn = e.target.closest('.remove-item-btn');
+                if (rmBtn && rmBtn.dataset.id && cartItems[rmBtn.dataset.id]) {
+                    const id = rmBtn.dataset.id;
+                    Swal.fire({
+                        title: 'Hapus Produk Ini?',
+                        text: "Produk akan dihapus dari keranjang.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            delete cartItems[id];
+                            renderCartItems();
+                            updateCartTotals();
+                            if (Object.keys(cartItems).length === 0) {
+                                paidAmount = 0;
+                                updateDisplays();
+                            }
+                            showAlert('Produk dihapus!', 'success');
+                        }
+                    });
+                }
+            });
+        }
 
         // ====================== BAYAR ======================
         const reviewModalEl   = document.getElementById("reviewModal");
@@ -373,219 +375,227 @@
         const successTotal    = document.getElementById("success-total");
         const successChange   = document.getElementById("success-change");
 
-        document.getElementById("process-payment-btn").addEventListener("click", () => {
-            const items = Object.values(cartItems);
-            if(items.length === 0){
-                Swal.fire({ icon: 'warning', text: 'Keranjang kosong!', timer: 1500, showConfirmButton:false });
-                return;
-            }
-
-            let subtotal = 0;
-            const reviewItems = document.getElementById("review-items");
-            reviewItems.innerHTML = "";
-
-            items.forEach(item => {
-                let sub = item.harga * item.quantity;
-                subtotal += sub;
-
-                const row = document.createElement("div");
-                row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
-
-                const leftCol = document.createElement("div");
-                leftCol.style.display = "flex";
-                leftCol.style.flexDirection = "column";
-
-                const nameEl = document.createElement("span");
-                nameEl.textContent = item.nama_produk || item.name;
-                nameEl.style.fontWeight = "500";
-
-                const qtyEl = document.createElement("span");
-                qtyEl.textContent = `${item.quantity || item.qty}x`;
-                qtyEl.style.fontSize = "0.85rem";
-                qtyEl.style.color = "#6c757d";
-
-                leftCol.appendChild(nameEl);
-                leftCol.appendChild(qtyEl);
-
-                const rightCol = document.createElement("span");
-                rightCol.textContent = formatRupiah(sub);
-                rightCol.style.fontWeight = "500";
-
-                row.appendChild(leftCol);
-                row.appendChild(rightCol);
-
-                reviewItems.appendChild(row);
-            });
-
-            let dibayar = paidAmount || subtotal;
-            let kembalian = dibayar - subtotal;
-
-            reviewSubtotal.textContent = formatRupiah(subtotal);
-            reviewPaid.textContent     = formatRupiah(dibayar);
-            reviewChange.textContent   = formatRupiah(kembalian);
-
-            reviewModalEl._subtotal   = subtotal;
-            reviewModalEl._dibayar    = dibayar;
-            reviewModalEl._kembalian  = kembalian;
-
-            reviewModal.show();
-        });
-
-        document.getElementById("confirm-payment-btn").addEventListener("click", () => {
-            const subtotal   = reviewModalEl._subtotal;
-            const dibayar    = reviewModalEl._dibayar;
-            const kembalian  = reviewModalEl._kembalian;
-            const items      = Object.values(cartItems);
-
-           fetch(routeSaveTransaction, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    subtotal: subtotal,
-                    dibayar: dibayar,
-                    kembalian: kembalian,
-                    items: items,
-                    is_lunas: document.getElementById('is_lunas').checked ? 1 : 0,
-                    customer_id: document.getElementById('selected-customer-id')?.value || null,
-                })      
-            })
-            .then(async res => {
-                const text = await res.text();
-                try {
-                    const data = JSON.parse(text);
-                    reviewModal.hide();
-
-                    if(data.success){
-                        successSubtotal.textContent = formatRupiah(subtotal);
-                        successTotal.textContent    = formatRupiah(subtotal);
-                        successChange.textContent   = formatRupiah(kembalian);
-
-                        successModal.show();
-
-                        cartItems = {};
-                        renderCartItems();
-                        updateCartTotals();
-                        paidAmount = 0;
-                        updateDisplays();
-                    } else {
-                        Swal.fire({ icon:'error', text: 'Gagal simpan transaksi!' });
-                    }
-                } catch (err) {
-                    console.error("JSON parse error:", err);
-                    Swal.fire({ icon:'error', text: 'Server mengembalikan HTML/response tidak valid!' });
+        const processPaymentBtn = document.getElementById("process-payment-btn");
+        if (processPaymentBtn){
+            processPaymentBtn.addEventListener("click", () => {
+                const items = Object.values(cartItems);
+                if(items.length === 0){
+                    Swal.fire({ icon: 'warning', text: 'Keranjang kosong!', timer: 1500, showConfirmButton:false });
+                    return;
                 }
-            })
-            .catch(err => {
-                console.error("Fetch error:", err);
-                Swal.fire({ icon:'error', text: 'Terjadi kesalahan!' });
+    
+                let subtotal = 0;
+                const reviewItems = document.getElementById("review-items");
+                reviewItems.innerHTML = "";
+    
+                items.forEach(item => {
+                    let sub = item.harga * item.quantity;
+                    subtotal += sub;
+    
+                    const row = document.createElement("div");
+                    row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
+    
+                    const leftCol = document.createElement("div");
+                    leftCol.style.display = "flex";
+                    leftCol.style.flexDirection = "column";
+    
+                    const nameEl = document.createElement("span");
+                    nameEl.textContent = item.nama_produk || item.name;
+                    nameEl.style.fontWeight = "500";
+    
+                    const qtyEl = document.createElement("span");
+                    qtyEl.textContent = `${item.quantity || item.qty}x`;
+                    qtyEl.style.fontSize = "0.85rem";
+                    qtyEl.style.color = "#6c757d";
+    
+                    leftCol.appendChild(nameEl);
+                    leftCol.appendChild(qtyEl);
+    
+                    const rightCol = document.createElement("span");
+                    rightCol.textContent = formatRupiah(sub);
+                    rightCol.style.fontWeight = "500";
+    
+                    row.appendChild(leftCol);
+                    row.appendChild(rightCol);
+    
+                    reviewItems.appendChild(row);
+                });
+    
+                let dibayar = paidAmount || subtotal;
+                let kembalian = dibayar - subtotal;
+    
+                reviewSubtotal.textContent = formatRupiah(subtotal);
+                reviewPaid.textContent     = formatRupiah(dibayar);
+                reviewChange.textContent   = formatRupiah(kembalian);
+    
+                reviewModalEl._subtotal   = subtotal;
+                reviewModalEl._dibayar    = dibayar;
+                reviewModalEl._kembalian  = kembalian;
+    
+                reviewModal.show();
             });
-        });
+        }
+
+        const confirmPaymentBtn = document.getElementById("confirm-payment-btn");
+        if(confirmPaymentBtn){
+            confirmPaymentBtn.addEventListener("click", () => {
+                const subtotal   = reviewModalEl._subtotal;
+                const dibayar    = reviewModalEl._dibayar;
+                const kembalian  = reviewModalEl._kembalian;
+                const items      = Object.values(cartItems);
+    
+               fetch(routeSaveTransaction, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        subtotal: subtotal,
+                        dibayar: dibayar,
+                        kembalian: kembalian,
+                        items: items,
+                        is_lunas: document.getElementById('is_lunas').checked ? 1 : 0,
+                        customer_id: document.getElementById('selected-customer-id')?.value || null,
+                    })      
+                })
+                .then(async res => {
+                    const text = await res.text();
+                    try {
+                        const data = JSON.parse(text);
+                        reviewModal.hide();
+    
+                        if(data.success){
+                            successSubtotal.textContent = formatRupiah(subtotal);
+                            successTotal.textContent    = formatRupiah(subtotal);
+                            successChange.textContent   = formatRupiah(kembalian);
+    
+                            successModal.show();
+    
+                            cartItems = {};
+                            renderCartItems();
+                            updateCartTotals();
+                            paidAmount = 0;
+                            updateDisplays();
+                        } else {
+                            Swal.fire({ icon:'error', text: 'Gagal simpan transaksi!' });
+                        }
+                    } catch (err) {
+                        console.error("JSON parse error:", err);
+                        Swal.fire({ icon:'error', text: 'Server mengembalikan HTML/response tidak valid!' });
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    Swal.fire({ icon:'error', text: 'Terjadi kesalahan!' });
+                });
+            });
+        }
 
         // ====================== UTANG ======================
         const isLunasCheckbox = document.getElementById("is_lunas");
 
-        isLunasCheckbox.addEventListener("change", function () {
-            if (!this.checked) {
-                Swal.fire({
-                    title: "Cari Customer",
-                    html: `
-                        <input type="text" id="search-customer" class="swal2-input" placeholder="Ketik nama customer...">
-                        <div id="customer-list" class="list-group mt-2" style="max-height:200px;overflow-y:auto;"></div>
-                    `,
-                    showConfirmButton: false,
-                    allowOutsideClick: true,
-                    allowEscapeKey: true,
-                    backdrop: true,
-                    didOpen: () => {
-                        const popup = Swal.getPopup();
-                        const input = popup.querySelector("#search-customer");
-                        const list  = popup.querySelector("#customer-list");
-
-                        input.focus();
-
-                        input.addEventListener("input", function () {
-                            let query = this.value;
-
-                            if (query.length < 2) {
-                                list.innerHTML = "<div class='text-muted text-center'>Ketik minimal 2 huruf...</div>";
-                                return;
-                            }
-
-                            fetch(`/search-customer?q=${query}`)
-                                .then(res => res.json())
-                                .then(data => {
-                                    let html = "";
-                                    if (data.length > 0) {
-                                        data.forEach(c => {
-                                            html += `
-                                                <div class="list-group-item list-group-item-action customer-item" data-id="${c.id}">
-                                                    ${c.customer_name}
-                                                </div>`;
-                                        });
-                                        list.innerHTML = html;
-
-                                        list.querySelectorAll(".customer-item").forEach(item => {
-                                            item.addEventListener("click", function () {
-                                                let id   = this.getAttribute("data-id");
-                                                let name = this.textContent;
-
-                                                document.getElementById("selected-customer-id")?.remove();
-
-                                                let hidden = document.createElement("input");
-                                                hidden.type = "hidden";
-                                                hidden.name = "customer_id";
-                                                hidden.id   = "selected-customer-id";
-                                                hidden.value = id;
-                                                document.querySelector("form")?.appendChild(hidden);
-
-                                                document.getElementById("selected-customer-name").textContent = name;
-
-                                                Swal.close();
-
-                                                Swal.fire({
-                                                    icon: "success",
-                                                    title: "Customer dipilih",
-                                                    text: name,
-                                                    timer: 1500,
-                                                    showConfirmButton: false
+        if(isLunasCheckbox){
+            isLunasCheckbox.addEventListener("change", function () {
+                if (!this.checked) {
+                    Swal.fire({
+                        title: "Cari Customer",
+                        html: `
+                            <input type="text" id="search-customer" class="swal2-input" placeholder="Ketik nama customer...">
+                            <div id="customer-list" class="list-group mt-2" style="max-height:200px;overflow-y:auto;"></div>
+                        `,
+                        showConfirmButton: false,
+                        allowOutsideClick: true,
+                        allowEscapeKey: true,
+                        backdrop: true,
+                        didOpen: () => {
+                            const popup = Swal.getPopup();
+                            const input = popup.querySelector("#search-customer");
+                            const list  = popup.querySelector("#customer-list");
+    
+                            input.focus();
+    
+                            input.addEventListener("input", function () {
+                                let query = this.value;
+    
+                                if (query.length < 2) {
+                                    list.innerHTML = "<div class='text-muted text-center'>Ketik minimal 2 huruf...</div>";
+                                    return;
+                                }
+    
+                                fetch(`/search-customer?q=${query}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        let html = "";
+                                        if (data.length > 0) {
+                                            data.forEach(c => {
+                                                html += `
+                                                    <div class="list-group-item list-group-item-action customer-item" data-id="${c.id}">
+                                                        ${c.customer_name}
+                                                    </div>`;
+                                            });
+                                            list.innerHTML = html;
+    
+                                            list.querySelectorAll(".customer-item").forEach(item => {
+                                                item.addEventListener("click", function () {
+                                                    let id   = this.getAttribute("data-id");
+                                                    let name = this.textContent;
+    
+                                                    document.getElementById("selected-customer-id")?.remove();
+    
+                                                    let hidden = document.createElement("input");
+                                                    hidden.type = "hidden";
+                                                    hidden.name = "customer_id";
+                                                    hidden.id   = "selected-customer-id";
+                                                    hidden.value = id;
+                                                    document.querySelector("form")?.appendChild(hidden);
+    
+                                                    document.getElementById("selected-customer-name").textContent = name;
+    
+                                                    Swal.close();
+    
+                                                    Swal.fire({
+                                                        icon: "success",
+                                                        title: "Customer dipilih",
+                                                        text: name,
+                                                        timer: 1500,
+                                                        showConfirmButton: false
+                                                    });
                                                 });
                                             });
-                                        });
-                                    } else {
-                                        list.innerHTML = "<div class='text-muted text-center'>Tidak ditemukan</div>";
-                                    }
-                                });
-                        });
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: "Konfirmasi",
-                    text: "Apakah yakin customer dibersihkan dan transaksi dianggap tunai?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Ya, hapus customer",
-                    cancelButtonText: "Batal"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById("selected-customer-id")?.remove();
-                        document.getElementById("selected-customer-name").textContent = "Belum dipilih";
-
-                        Swal.fire({
-                            icon: "success",
-                            title: "Customer dihapus",
-                            timer: 1200,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        isLunasCheckbox.checked = false;
-                    }
-                });
-            }
-        });
+                                        } else {
+                                            list.innerHTML = "<div class='text-muted text-center'>Tidak ditemukan</div>";
+                                        }
+                                    });
+                            });
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Konfirmasi",
+                        text: "Apakah yakin customer dibersihkan dan transaksi dianggap tunai?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Ya, hapus customer",
+                        cancelButtonText: "Batal"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById("selected-customer-id")?.remove();
+                            document.getElementById("selected-customer-name").textContent = "Belum dipilih";
+    
+                            Swal.fire({
+                                icon: "success",
+                                title: "Customer dihapus",
+                                timer: 1200,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            isLunasCheckbox.checked = false;
+                        }
+                    });
+                }
+            });
+        }
 
         // ====================== CATEGORY FILTER ======================
         const subcategoryButtons = document.querySelectorAll('.subcategory-btn');
@@ -613,50 +623,56 @@
         });
 
         // ====================== CLEAR CART ======================
-        document.getElementById('clear-cart-btn').addEventListener('click', function () {
-            Swal.fire({
-                title: 'Hapus Semua Produk di Keranjang?',
-                text: "Tindakan ini tidak bisa dibatalkan!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, kosongkan!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    cartItems = {};
-                    renderCartItems();
-                    updateCartTotals();
-                    if (Object.keys(cartItems).length === 0) {
-                        paidAmount = 0;
-                        updateDisplays();
+        const cleatCartBtn = document.getElementById('clear-cart-btn');
+        if(cleatCartBtn){
+            document.getElementById('clear-cart-btn').addEventListener('click', function () {
+                Swal.fire({
+                    title: 'Hapus Semua Produk di Keranjang?',
+                    text: "Tindakan ini tidak bisa dibatalkan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, kosongkan!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        cartItems = {};
+                        renderCartItems();
+                        updateCartTotals();
+                        if (Object.keys(cartItems).length === 0) {
+                            paidAmount = 0;
+                            updateDisplays();
+                        }
+                        showAlert('Keranjang dikosongkan!', 'success');
                     }
-                    showAlert('Keranjang dikosongkan!', 'success');
-                }
+                });
             });
-        });
+        }
 
         // ====================== CLICK PRODUCT CARD (DELEGATION) ======================
-        document.getElementById('products-grid').addEventListener('click', function(e) {
-            const card = e.target.closest('.product-card');
-            if (!card) return;
-            const productId = card.dataset.productId;
-            fetch(`/products/get/${productId}`)
-                .then(response => response.json())
-                .then(product => {
-                    if (product.error) {
-                        showAlert(product.error, 'danger');
-                    } else {
-                        addToCart(product);
-                        showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    showAlert('Gagal menambahkan produk.', 'danger');
-                });
-        });
+        const productGrid = document.getElementById('products-grid');
+        if(productGrid){
+            document.getElementById('products-grid').addEventListener('click', function(e) {
+                const card = e.target.closest('.product-card');
+                if (!card) return;
+                const productId = card.dataset.productId;
+                fetch(`/products/get/${productId}`)
+                    .then(response => response.json())
+                    .then(product => {
+                        if (product.error) {
+                            showAlert(product.error, 'danger');
+                        } else {
+                            addToCart(product);
+                            showAlert('Produk berhasil ditambahkan ke keranjang', 'success');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        showAlert('Gagal menambahkan produk.', 'danger');
+                    });
+            });
+        }
 
         // ====================== PAYMENT (DENOM + KEYPAD) ======================
         function getTotalAmount() {
@@ -664,11 +680,10 @@
         }
 
         function updateDisplays() {
-            paidDisplay.textContent = formatRupiah(paidAmount);
-            const totalAmount = getTotalAmount();
-            const change = paidAmount - totalAmount;
-            changeDisplay.textContent = formatRupiah(Math.max(change, 0));
-            processBtn.disabled = (totalAmount === 0) || (paidAmount < totalAmount);
+            if (paidDisplay) paidDisplay.textContent = formatRupiah(paidAmount);
+            const totalAmount = totalDisplay ? parseRupiah(totalDisplay.textContent) : 0;
+            if (changeDisplay) changeDisplay.textContent = formatRupiah(Math.max(paidAmount - totalAmount, 0));
+            if (processBtn) processBtn.disabled = (totalAmount === 0) || (paidAmount < totalAmount);
         }
 
         document.querySelectorAll('.denomination-btn').forEach(btn => {
@@ -692,17 +707,15 @@
 
         function addToCart(product) {
             const id = product.id;
-            if (cartItems[id]) {
-                cartItems[id].quantity += 1;
-            } else {
-                cartItems[id] = { ...product, quantity: 1 };
-            }
+            if (cartItems[id]) cartItems[id].quantity += 1;
+            else cartItems[id] = { ...product, quantity: 1 };
             renderCartItems();
             updateCartTotals();
         }
 
         function renderCartItems() {
             const container = document.getElementById('cart-items');
+            if (!container) return;
             container.innerHTML = "";
             Object.values(cartItems).forEach(item => {
                 const row = document.createElement('div');
@@ -722,8 +735,8 @@
         }
 
         function updateCartTotals() {
-            const total = getCartTotal();
-            totalDisplay.textContent = formatRupiah(total);
+            if (!totalDisplay) return;
+            totalDisplay.textContent = formatRupiah(getCartTotal());
             updateDisplays();
         }
 

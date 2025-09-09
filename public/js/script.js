@@ -42,6 +42,11 @@ function toggleFullscreen() {
     });
 }
 
+document.getElementById('refresh-btn').addEventListener('click', function() {
+    // Reload halaman saat tombol diklik
+    location.reload();
+});
+
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {  
     
@@ -79,10 +84,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Keep barcode input focused
     setInterval(() => {
-        const activeElement = document.activeElement;
         const barcodeInput = document.getElementById('barcode-input');
-        
-        // If no input is focused and no modal is open, focus barcode input
+        if (!barcodeInput) return; // ❌ hentikan kalau input tidak ada
+
+        const activeElement = document.activeElement;
         if (activeElement === document.body && !document.querySelector('.modal.show')) {
             barcodeInput.focus();
         }

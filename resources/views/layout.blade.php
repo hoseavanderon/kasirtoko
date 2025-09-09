@@ -27,7 +27,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 text-center">
+                <div class="col-md-6 text-center position-relative">
                     <div class="d-flex align-items-center justify-content-center gap-2">
 
                         <div class="d-flex align-items-center justify-content-center gap-3">
@@ -51,31 +51,28 @@
                             </div>
                         </div>
 
-                        <!-- <button class="navbar-btn active" title="Home" data-page="home">
-                            <i class="bi bi-house-door"></i>
-                        </button>
-
-                        <button class="navbar-btn" title="Daily Transaction Summary" data-page="daily-summary">
-                            <i class="bi bi-graph-up"></i>
-                        </button>
-
-                        <button class="navbar-btn" title="Transaction History by Date" data-page="transaction-history">
-                            <i class="bi bi-calendar-check"></i>
-                        </button>
-
-                        <button class="navbar-btn" title="Store Cash" data-page="store-cash">
-                            <i class="bi bi-cash-stack"></i>
-                        </button>
-
-                        <button class="navbar-btn" title="Customer Management" data-page="customers">
-                            <i class="bi bi-people"></i>
-                        </button>
-                        
-                        <button class="navbar-btn" title="Inventory History" data-page="inventory">
-                            <i class="bi bi-box-seam"></i>
-                        </button> -->
                     </div>
                 </div>
+                <button 
+                    id="refresh-btn"
+                    title="Refresh Page"
+                    class="position-absolute d-flex align-items-center justify-content-center"
+                    style="
+                        top: 5px;
+                        right: 5px;
+                        z-index: 999;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        border: none;
+                        background-color: #0d6efd; /* biru terang */
+                        color: #fff;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                        cursor: pointer;
+                    "
+                >
+                    <i class="bi bi-arrow-clockwise fs-5"></i>
+                </button>
             </div>
         </div>
     </div>
