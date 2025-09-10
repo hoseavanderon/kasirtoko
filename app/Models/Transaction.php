@@ -36,8 +36,19 @@ class Transaction extends Model
         $today = now()->format('dmY');
         $prefix = "NOTABRG{$today}";
 
-        $countToday = self::whereDate('created_at', today())->count() + 1;
+        // Ambil nomor nota terakhir hari ini
+        $lastNota = self::whereDate('created_at', today())
+            ->orderByDesc('id')
+            ->value('nomor_nota');
 
-        return $prefix . str_pad($countToday, 6, '0', STR_PAD_LEFT);
+        if ($lastNota) {
+            // Ambil 6 digit terakhir sebagai nomor urut
+            $lastNumber = (int) substr($lastNota, -6);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return $prefix . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
     }
 }

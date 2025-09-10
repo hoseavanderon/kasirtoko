@@ -1,4 +1,3 @@
-
 function addDenomination(amount) {
     var paidAmountInput = document.getElementById('paid-amount');
     if (!paidAmountInput) return;
@@ -44,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ================= FULLSCREEN BUTTON =================
     var fullscreenBtn = document.getElementById('fullscreen-btn');
-    var fullscreenIcon = document.getElementById('fullscreen-icon');
+    var fullscreenIcon = fullscreenBtn ? fullscreenBtn.querySelector('i') : null;
 
     if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', toggleFullscreen);
@@ -52,6 +51,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.addEventListener('fullscreenchange', function() {
+        if (!fullscreenIcon) return;
+
         if (document.fullscreenElement) {
             fullscreenIcon.className = 'bi bi-fullscreen-exit';
             fullscreenBtn.title = 'Exit Fullscreen';
@@ -90,4 +91,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 1000);
 });
-
