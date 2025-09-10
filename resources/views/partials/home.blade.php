@@ -465,13 +465,14 @@
                         const data = JSON.parse(text);
                         reviewModal.hide();
     
-                        if(data.success){
+                        if (data.success) {
                             successSubtotal.textContent = formatRupiah(subtotal);
                             successTotal.textContent    = formatRupiah(subtotal);
                             successChange.textContent   = formatRupiah(kembalian);
-    
+
+                            reviewModal.hide();
                             successModal.show();
-    
+
                             cartItems = {};
                             renderCartItems();
                             updateCartTotals();
@@ -489,7 +490,7 @@
                     console.error("Fetch error:", err);
                     Swal.fire({ icon:'error', text: 'Terjadi kesalahan!' });
                 });
-            });
+            }, { once: true });
         }
 
         // ====================== UTANG ======================

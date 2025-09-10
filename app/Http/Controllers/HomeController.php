@@ -33,7 +33,17 @@ class HomeController extends Controller
                 $data['categories'] = Category::with('subcategories')->get();
                 $data['products'] = Product::all();
                 break;
-            default:
+
+            case 'history':
+                $today = now()->toDateString();
+
+                $transactions = Transaction::with(['detailTransactions.product'])
+                    ->whereDate('created_at', $today)
+                    ->get();
+
+                // total dari transaksi langsung (bukan dari detail)
+                $data['totalPenjualan'] = $transactions->sum('subtotal'); 
+                $data['transactions'] = $transactions;
                 break;
         }
 

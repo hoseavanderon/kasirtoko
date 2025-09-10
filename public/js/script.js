@@ -15,31 +15,15 @@ function addDenomination(amount) {
 }
 
 function toggleFullscreen() {
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const fullscreenIcon = document.getElementById('fullscreen-icon') || fullscreenBtn.querySelector('i');
-
-    fullscreenBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error('Error attempting to enable fullscreen:', err);
-            });
-        } else {
-            document.exitFullscreen().catch(err => {
-                console.error('Error attempting to exit fullscreen:', err);
-            });
-        }
-    });
-
-    // Listen to fullscreen changes
-    document.addEventListener('fullscreenchange', () => {
-        if (document.fullscreenElement) {
-            fullscreenIcon.className = 'bi bi-fullscreen-exit';
-            fullscreenBtn.title = 'Exit Fullscreen';
-        } else {
-            fullscreenIcon.className = 'bi bi-arrows-fullscreen';
-            fullscreenBtn.title = 'Enter Fullscreen';
-        }
-    });
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.error('Error attempting to enable fullscreen:', err);
+        });
+    } else {
+        document.exitFullscreen().catch(err => {
+            console.error('Error attempting to exit fullscreen:', err);
+        });
+    }
 }
 
 document.getElementById('refresh-btn').addEventListener('click', function() {
