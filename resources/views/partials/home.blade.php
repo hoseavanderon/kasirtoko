@@ -376,75 +376,67 @@
         const successChange   = document.getElementById("success-change");
 
         const processPaymentBtn = document.getElementById("process-payment-btn");
-        if (processPaymentBtn){
+        if (processPaymentBtn) {
             processPaymentBtn.addEventListener("click", () => {
                 const items = Object.values(cartItems);
-                if(items.length === 0){
+                if (items.length === 0) {
                     Swal.fire({ icon: 'warning', text: 'Keranjang kosong!', timer: 1500, showConfirmButton:false });
                     return;
                 }
-    
+
                 let subtotal = 0;
-                const reviewItems = document.getElementById("review-items");
-                reviewItems.innerHTML = "";
-    
+                const reviewItemsEl = document.getElementById("review-items");
+                reviewItemsEl.innerHTML = "";
+
                 items.forEach(item => {
-                    let sub = item.harga * item.quantity;
+                    const sub = item.harga * item.quantity;
                     subtotal += sub;
-    
+
                     const row = document.createElement("div");
                     row.classList.add("d-flex", "justify-content-between", "align-items-center", "mb-2");
-    
-                    const leftCol = document.createElement("div");
-                    leftCol.style.display = "flex";
-                    leftCol.style.flexDirection = "column";
-    
-                    const nameEl = document.createElement("span");
-                    nameEl.textContent = item.nama_produk || item.name;
-                    nameEl.style.fontWeight = "500";
-    
-                    const qtyEl = document.createElement("span");
-                    qtyEl.textContent = `${item.quantity || item.qty}x`;
-                    qtyEl.style.fontSize = "0.85rem";
-                    qtyEl.style.color = "#6c757d";
-    
-                    leftCol.appendChild(nameEl);
-                    leftCol.appendChild(qtyEl);
-    
-                    const rightCol = document.createElement("span");
-                    rightCol.textContent = formatRupiah(sub);
-                    rightCol.style.fontWeight = "500";
-    
-                    row.appendChild(leftCol);
-                    row.appendChild(rightCol);
-    
-                    reviewItems.appendChild(row);
+
+                    row.innerHTML = `
+                        <div style="display:flex;flex-direction:column">
+                            <span style="font-weight:500">${item.nama_produk || item.name}</span>
+                            <span style="font-size:0.85rem;color:#6c757d">${item.quantity}x</span>
+                        </div>
+                        <span style="font-weight:500">${formatRupiah(sub)}</span>
+                    `;
+                    reviewItemsEl.appendChild(row);
                 });
-    
+
                 let dibayar = paidAmount || subtotal;
                 let kembalian = dibayar - subtotal;
-    
+
                 reviewSubtotal.textContent = formatRupiah(subtotal);
                 reviewPaid.textContent     = formatRupiah(dibayar);
                 reviewChange.textContent   = formatRupiah(kembalian);
-    
-                reviewModalEl._subtotal   = subtotal;
-                reviewModalEl._dibayar    = dibayar;
-                reviewModalEl._kembalian  = kembalian;
-    
+
+                // Simpan sementara di modal
+                reviewModalEl._subtotal  = subtotal;
+                reviewModalEl._dibayar   = dibayar;
+                reviewModalEl._kembalian = kembalian;
+
                 reviewModal.show();
             });
         }
 
-        const confirmPaymentBtn = document.getElementById("confirm-payment-btn");
-        if(confirmPaymentBtn){
-            confirmPaymentBtn.addEventListener("click", () => {
-                const subtotal   = reviewModalEl._subtotal;
-                const dibayar    = reviewModalEl._dibayar;
-                const kembalian  = reviewModalEl._kembalian;
-                const items      = Object.values(cartItems);
-    
-               fetch(routeSaveTransaction, {
+        // Listener confirm di-bungkus di show.bs.modal
+        reviewModalEl.addEventListener('show.bs.modal', () => {
+            const confirmBtn = document.getElementById("confirm-payment-btn");
+            if (!confirmBtn) return;
+
+            // Hapus listener lama
+            const newBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+            newBtn.addEventListener("click", () => {
+                const subtotal  = reviewModalEl._subtotal;
+                const dibayar   = reviewModalEl._dibayar;
+                const kembalian = reviewModalEl._kembalian;
+                const items     = Object.values(cartItems);
+
+                fetch(routeSaveTransaction, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -457,41 +449,41 @@
                         items: items,
                         is_lunas: document.getElementById('is_lunas').checked ? 1 : 0,
                         customer_id: document.getElementById('selected-customer-id')?.value || null,
-                    })      
+                    })
                 })
-                .then(async res => {
-                    const text = await res.text();
-                    try {
-                        const data = JSON.parse(text);
-                        reviewModal.hide();
-    
-                        if (data.success) {
-                            successSubtotal.textContent = formatRupiah(subtotal);
-                            successTotal.textContent    = formatRupiah(subtotal);
-                            successChange.textContent   = formatRupiah(kembalian);
+                .then(res => res.json())
+                .then(data => {
+                    reviewModal.hide(); // tutup modal review
 
-                            reviewModal.hide();
-                            successModal.show();
+                    if (data.success) {
+                        // Reset cart & total
+                        cartItems = {};
+                        renderCartItems();
+                        updateCartTotals();
+                        paidAmount = 0;
+                        updateDisplays();
 
-                            cartItems = {};
-                            renderCartItems();
-                            updateCartTotals();
-                            paidAmount = 0;
-                            updateDisplays();
-                        } else {
-                            Swal.fire({ icon:'error', text: 'Gagal simpan transaksi!' });
-                        }
-                    } catch (err) {
-                        console.error("JSON parse error:", err);
-                        Swal.fire({ icon:'error', text: 'Server mengembalikan HTML/response tidak valid!' });
+                        // Tampilkan modal sukses
+                        const successSubtotal = document.getElementById("success-subtotal");
+                        const successTotal    = document.getElementById("success-total");
+                        const successChange   = document.getElementById("success-change");
+
+                        if (successSubtotal) successSubtotal.textContent = formatRupiah(subtotal);
+                        if (successTotal)    successTotal.textContent    = formatRupiah(subtotal);
+                        if (successChange)   successChange.textContent   = formatRupiah(kembalian);
+
+                        successModal.show();
+                    } else {
+                        Swal.fire({ icon:'error', text: 'Gagal simpan transaksi!' });
                     }
                 })
                 .catch(err => {
-                    console.error("Fetch error:", err);
+                    console.error(err);
                     Swal.fire({ icon:'error', text: 'Terjadi kesalahan!' });
                 });
-            }, { once: true });
-        }
+            });
+        });
+
 
         // ====================== UTANG ======================
         const isLunasCheckbox = document.getElementById("is_lunas");

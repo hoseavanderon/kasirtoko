@@ -164,7 +164,7 @@
 </div>
 
 <script>
-   let visible = 10; // default tampil 5 item
+    let visible = 5; // default tampil 5 item
     const items = document.querySelectorAll('#history-list .history-item');
     const btn = document.getElementById('load-more-btn');
 
@@ -176,16 +176,18 @@
         let remaining = items.length - visible;
         if (remaining > 0) {
             btn.style.display = 'inline-block';
-            btn.textContent = `Load ${remaining} more`; // sesuai sisa
+            btn.textContent = `Load ${remaining} more`;
         } else {
             btn.style.display = 'none';
         }
     }
 
-    btn.addEventListener('click', () => {
-        visible += 5; // tiap klik tambah 5
-        updateList();
-    });
+    if(btn) {
+        btn.addEventListener('click', () => {
+            visible += 5;
+            updateList();
+        });
+    }
 
     // Inisialisasi pertama kali
     updateList();
