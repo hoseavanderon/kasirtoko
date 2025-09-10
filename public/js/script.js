@@ -37,11 +37,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fullscreen button
     document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
     
-    // Listen for fullscreen changes
-    document.addEventListener('fullscreenchange', function() {
-        const fullscreenIcon = document.getElementById('fullscreen-icon');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-        
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+
+    fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            // Android Chrome OK, iOS Safari akan fallback
+            document.documentElement.requestFullscreen?.().catch(err => {
+                console.warn('Fullscreen gagal:', err);
+            });
+        } else {
+            document.exitFullscreen?.().catch(err => {
+                console.warn('Exit fullscreen gagal:', err);
+            });
+        }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
         if (document.fullscreenElement) {
             fullscreenIcon.className = 'bi bi-fullscreen-exit';
             fullscreenBtn.title = 'Exit Fullscreen';
