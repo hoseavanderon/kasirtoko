@@ -1,47 +1,57 @@
 
-
 function addDenomination(amount) {
-    const paidAmountInput = document.getElementById('paid-amount');
+    var paidAmountInput = document.getElementById('paid-amount');
     if (!paidAmountInput) return;
 
-    let currentValue = paidAmountInput.value;
-    let currentNumber = parseInt(currentValue.replace(/[^0-9]/g, '')) || 0;
+    var currentValue = paidAmountInput.value;
+    var currentNumber = parseInt(currentValue.replace(/[^0-9]/g, '')) || 0;
 
-    let newAmount = currentNumber + amount;
-
+    var newAmount = currentNumber + amount;
     paidAmountInput.value = formatRupiah(newAmount);
 
     updateChangeDisplay();
 }
 
+// Toggle fullscreen (desktop & tablet/HP Android)
+// Catatan: Safari iOS tidak mendukung requestFullscreen
 function toggleFullscreen() {
     if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen?.().catch(err => {
-            console.error('Error attempting to enable fullscreen:', err);
-        });
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(function(err) {
+                console.error('Error attempting to enable fullscreen:', err);
+            });
+        }
     } else {
-        document.exitFullscreen?.().catch(err => {
-            console.error('Error attempting to exit fullscreen:', err);
-        });
+        if (document.exitFullscreen) {
+            document.exitFullscreen().catch(function(err) {
+                console.error('Error attempting to exit fullscreen:', err);
+            });
+        }
     }
 }
 
 document.addEventListener('DOMContentLoaded', function() {  
-
-    const refreshBtn = document.getElementById('refresh-btn');
+    // ================= REFRESH BUTTON =================
+    var refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
+        refreshBtn.addEventListener('click', function() {
+            location.reload();
+        });
+        refreshBtn.addEventListener('touchend', function() {
             location.reload();
         });
     }
 
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const fullscreenIcon = document.getElementById('fullscreen-icon');
+    // ================= FULLSCREEN BUTTON =================
+    var fullscreenBtn = document.getElementById('fullscreen-btn');
+    var fullscreenIcon = document.getElementById('fullscreen-icon');
 
-    // ✅ hanya 1 listener
-    fullscreenBtn.addEventListener('click', toggleFullscreen);
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        fullscreenBtn.addEventListener('touchend', toggleFullscreen);
+    }
 
-    document.addEventListener('fullscreenchange', () => {
+    document.addEventListener('fullscreenchange', function() {
         if (document.fullscreenElement) {
             fullscreenIcon.className = 'bi bi-fullscreen-exit';
             fullscreenBtn.title = 'Exit Fullscreen';
@@ -51,27 +61,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Keyboard shortcuts
+    // ================= KEYBOARD SHORTCUTS =================
     document.addEventListener('keydown', function(e) {
+        // F11 for fullscreen
         if (e.key === 'F11') {
             e.preventDefault();
             toggleFullscreen();
         }
 
+        // Escape to clear barcode input
         if (e.key === 'Escape') {
-            document.getElementById('barcode-input').value = '';
-            document.getElementById('barcode-input').focus();
+            var barcodeInput = document.getElementById('barcode-input');
+            if (barcodeInput) {
+                barcodeInput.value = '';
+                barcodeInput.focus();
+            }
         }
     });
 
-    // Keep barcode input focused
-    setInterval(() => {
-        const barcodeInput = document.getElementById('barcode-input');
+    // ================= KEEP BARCODE INPUT FOCUSED =================
+    setInterval(function() {
+        var barcodeInput = document.getElementById('barcode-input');
         if (!barcodeInput) return;
 
-        const activeElement = document.activeElement;
+        var activeElement = document.activeElement;
         if (activeElement === document.body && !document.querySelector('.modal.show')) {
             barcodeInput.focus();
         }
     }, 1000);
 });
+
