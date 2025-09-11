@@ -48,10 +48,10 @@
                                     <i class="bi bi-clock-history"></i>
                                 </button>
 
-                                <button class="navbar-btn" title="History" data-page="historys">
+                                <a href="{{ route('pembukuan.index') }}" class="navbar-btn" title="Pembukuan">
                                     <i class="bi bi-clock-history"></i>
-                                </button>
-                                <!-- dst -->
+                                </a>
+                            <!-- dst -->
                             </div>
                         </div>
 

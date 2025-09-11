@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\PembukuanController;
 
 Route::get('/', function () {
     return redirect()->route('home');
@@ -17,4 +18,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/products/get/{id}', [ProductController::class, 'getProduct']);
     Route::get('/search-customer', [CustomerController::class, 'search'])->name('customers.search');
     Route::post('/transactions/save', [HomeController::class, 'saveTransaction'])->name('transactions.save');
+    Route::get('/pembukuan', [PembukuanController::class, 'index'])->name('pembukuan.index');
 });
