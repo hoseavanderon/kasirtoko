@@ -5,22 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POS Transaction History</title>
     <link rel="stylesheet" href="{{ asset('css/pembukuan.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
     <div class="container">
-        <!-- Title for mobile and tablet -->
+
         <div class="page-title">
             <h1>Riwayat Pembukuan</h1>
+
+            <div class="page-actions">
+                <a href="{{ route('home') }}" class="btn-icon" title="Home">
+                    <i class="fas fa-home"></i>
+                </a>
+
+                <button class="btn-icon" title="Fullscreen" onclick="toggleFullscreen(this)">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Balance Card -->
-        <div class="balance-card">
-            <div class="balance-header">
-                <h3>Sisa Saldo</h3>
-                <div class="menu-dots">⋯</div>
+        <div class="balance-section">
+            <div class="balance-card">
+                <div class="balance-header">
+                    <h3>Sisa Saldo</h3>
+                    <div class="menu-dots" id="menuDots">⋯</div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <button id="showFormBtn">➕ Tambah Pembukuan</button>
+                    </div>
+                </div>
+                <div class="balance-amount">
+                    Rp {{ number_format($saldo, 0, ',', '.') }}
+                </div>
+                <div class="account-info">
+                    Terakhir Di Update : {{ $lastUpdated ? \Carbon\Carbon::parse($lastUpdated)->format('d M Y H:i') : '-' }}
+                </div>
             </div>
-            <div class="balance-amount">Rp {{ number_format($saldo, 0, ',', '.') }}</div>
-            <div class="account-info">
-                <div>Terakhir Di Update : {{ $lastUpdated ? \Carbon\Carbon::parse($lastUpdated)->format('d M Y H:i') : '-' }}</div>
+
+            <div class="form-card" id="formCard" style="display:none;">
+                <div class="form-header">
+                    <h3>Tambah Pembukuan</h3>
+                    <button class="close-form" id="closeFormBtn">−</button>
+                </div>
+                <form id="pembukuanForm" data-url="{{ route('pembukuan.store') }}">
+                    @csrf
+
+                    <!-- Deskripsi -->
+                    <div class="form-group">
+                        <h5 class="mb-2">Deskripsi</h5>
+                        <input type="text" id="deskripsi" name="deskripsi" required>
+                    </div>
+
+                    <!-- Nominal -->
+                    <div class="form-group">
+                        <h5 class="mb-2">Nominal</h5>
+                        <input type="number" id="nominal" name="nominal" required>
+                    </div>
+
+                    <!-- Category Pembukuan -->
+                    <div class="form-group">
+                        <h5 class="mb-2">Kategori</h5>
+                        <select id="category_pembukuan_id" name="category_pembukuan_id" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            @foreach($categoryPembukuans as $kategori)
+                                <option value="{{ $kategori->id }}">{{ $kategori->category_pembukuan }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Type (masuk / keluar) -->
+                    <div class="form-group">
+                        <h5 class="mb-2">Keluar / Masuk</h5>
+                        <select id="type" name="type" required>
+                            <option value="IN">Masuk</option>
+                            <option value="OUT">Keluar</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Simpan</button>
+                </form>
             </div>
         </div>
 
@@ -101,17 +164,33 @@
     </div>
 
     <script>
-        // data transaksi dari Laravel
         window.transactions = @json($riwayat);
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/pembukuan.js') }}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             if (typeof window.initPageScripts === "function") {
                 window.initPageScripts();
             }
+
         });
+        function toggleFullscreen(btn) {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    btn.querySelector("i").classList.remove("fa-expand");
+                    btn.querySelector("i").classList.add("fa-compress");
+                }).catch(err => {
+                    console.error(`Error attempting fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    btn.querySelector("i").classList.remove("fa-compress");
+                    btn.querySelector("i").classList.add("fa-expand");
+                });
+            }
+        }
     </script>
 </body>
 </html>

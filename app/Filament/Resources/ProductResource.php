@@ -102,6 +102,13 @@ class ProductResource extends Resource
                     ->relationship('supplier', 'supplier')
                     ->required(),
 
+                Forms\Components\Select::make('shelf_id')
+                    ->label('Shelf')
+                    ->relationship('shelf', 'name') // relasi ke model Shelf
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+
                 Repeater::make('attributeValues')
                     ->relationship('attributeValues')
                     ->schema([

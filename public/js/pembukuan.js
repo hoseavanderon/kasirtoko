@@ -252,6 +252,13 @@ function updateTransactions() {
                         <span class="detail-label">Saldo Saat Itu</span> 
                         <span class="detail-value">${formatRupiah(transaction.saldo_saat_ini)}</span>
                     </div>
+
+                    <!-- Tombol hapus -->
+                    <div class="detail-row">
+                        <button class="delete-btn">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -323,6 +330,180 @@ function getAmountClass(transaction) {
     if (transaction.type === 'transfer') return 'transfer';
     return 'negative';
 }
+
+function updateSaldo() {
+    const saldo = allTransactions.reduce((total, t) => {
+        return total + (t.type === 'IN' ? Number(t.nominal) : -Number(t.nominal));
+    }, 0);
+
+    const balanceAmountEl = document.querySelector('.balance-amount');
+    if (balanceAmountEl) {
+        balanceAmountEl.textContent = 'Rp ' + saldo.toLocaleString('id-ID');
+    }
+}
+
+const pembukuanForm = document.getElementById('pembukuanForm');
+
+if (pembukuanForm) {
+    pembukuanForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(pembukuanForm);
+        const formUrl = pembukuanForm.dataset.url;
+
+        fetch(formUrl, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                "Accept": "application/json",
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+                addTransaction({
+                    id: data.transaction.id,
+                    type: data.transaction.type,
+                    nominal: data.transaction.nominal,
+                    deskripsi: data.transaction.deskripsi,
+                    category_pembukuan: data.transaction.category_pembukuan, // langsung pakai property baru
+                    created_at: data.transaction.created_at,
+                    saldo_saat_ini: 0
+                });
+                // reset form
+                pembukuanForm.reset();
+            }
+        })
+        .catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: 'Terjadi kesalahan saat menambahkan transaksi.'
+            });
+            console.error(err);
+        });
+    });
+}
+
+function addTransaction(newTransaction) {
+    allTransactions.push(newTransaction);
+    recalculateSaldo();
+    updateTransactions();
+    updateSaldo();
+}
+
+function recalculateSaldo() {
+    let runningSaldo = 0;
+
+    // Urutkan dulu berdasarkan created_at ascending supaya saldo benar
+    allTransactions
+        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+        .forEach(t => {
+            runningSaldo += t.type === 'IN' ? Number(t.nominal) : -Number(t.nominal);
+            t.saldo_saat_ini = runningSaldo;
+        });
+}
+
+const menuDots = document.getElementById("menuDots");
+const dropdownMenu = document.getElementById("dropdownMenu");
+
+menuDots.addEventListener("click", (e) => {
+    e.stopPropagation(); // biar tidak langsung tertutup
+    dropdownMenu.classList.toggle("active"); // pakai class active untuk animasi
+});
+
+// Tutup dropdown kalau klik di luar
+document.addEventListener("click", () => {
+    dropdownMenu.classList.remove("active");
+});
+
+const showFormBtn = document.getElementById("showFormBtn");
+const closeFormBtn = document.getElementById("closeFormBtn");
+const formCard = document.getElementById("formCard");
+
+if (showFormBtn && closeFormBtn && formCard) {
+    showFormBtn.addEventListener("click", () => {
+        formCard.style.display = "block";
+    });
+
+    closeFormBtn.addEventListener("click", () => {
+        formCard.style.display = "none";
+    });
+}
+
+transactionsList.addEventListener('click', function (e) {
+    if (e.target.closest('.delete-btn')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const transactionId = e.target.closest('.transaction-details').dataset.id;
+
+        Swal.fire({
+            title: 'Yakin hapus?',
+            text: "Transaksi ini akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/pembukuan/${transactionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        // Jika status bukan 2xx, anggap gagal
+                        throw new Error('Network response was not ok');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                        allTransactions = allTransactions.filter(t => t.id != transactionId);
+
+                        updateTransactions();
+                        recalculateSaldo();
+
+                        // update saldo dari backend
+                        const balanceAmountEl = document.querySelector('.balance-amount');
+                        if (balanceAmountEl) {
+                            balanceAmountEl.textContent = 'Rp ' + Number(data.saldo).toLocaleString('id-ID');
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error(err); // supaya bisa dilihat di console
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Terjadi kesalahan saat menghapus',
+                    });
+                });
+            }
+        });
+    }
+});
 
 window.initPageScripts = function() {
     if (document.getElementById('transactionsList')) {

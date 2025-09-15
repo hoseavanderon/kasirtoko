@@ -25,6 +25,19 @@
                                 Online
                             </small>
                         </div>
+
+                        <div>
+                            <div class="pos-tabs d-flex gap-2 mb-3 ms-3 mt-2" role="tablist">
+                                <button class="pos-tab active" id="barang-tab" data-bs-toggle="tab" data-bs-target="#barang-pane" type="button" role="tab">
+                                    <i class="bi bi-basket"></i>
+                                    <span>Barang</span>
+                                </button>
+                                <button class="pos-tab" id="digital-tab" data-bs-toggle="tab" data-bs-target="#digital-pane" type="button" role="tab">
+                                    <i class="bi bi-phone"></i>
+                                    <span>Digital</span>
+                                </button>
+                            </div>          
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-6 text-center position-relative">
@@ -48,9 +61,25 @@
                                     <i class="bi bi-clock-history"></i>
                                 </button>
 
+                                <button class="navbar-btn" title="Customer" data-page="customer">
+                                    <i class="bi bi-person"></i>
+                                </button>
+
+                                <button class="navbar-btn" title="Inventory History" data-page="inventory-history">
+                                    <i class="bi bi-box-seam"></i>
+                                </button>
+
+                                <button class="navbar-btn" title="Barang Masuk" data-page="barang-masuk">
+                                    <i class="bi bi-box-arrow-in-down"></i>
+                                </button>
+
                                 <a href="{{ route('pembukuan.index') }}" class="navbar-btn" title="Pembukuan">
-                                    <i class="bi bi-clock-history"></i>
+                                    <i class="bi bi-journal-text"></i>
                                 </a>
+
+                                <button class="navbar-btn" title="Rincian Hari Ini">
+                                    <i class="bi bi-clipboard-data"></i>
+                                </button>
                             <!-- dst -->
                             </div>
                         </div>

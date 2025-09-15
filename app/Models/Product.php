@@ -21,6 +21,7 @@ class Product extends Model
         'minimal_stok',
         'user_id',
         'supplier_id',
+        'shelf_id',
     ];
 
     public function category()
@@ -51,5 +52,10 @@ class Product extends Model
     public function attributeValues()
     {
         return $this->hasMany(ProductAttributeValue::class);
+    }
+
+    public function shelf()
+    {
+        return $this->belongsTo(Shelf::class);
     }
 }

@@ -19,4 +19,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/search-customer', [CustomerController::class, 'search'])->name('customers.search');
     Route::post('/transactions/save', [HomeController::class, 'saveTransaction'])->name('transactions.save');
     Route::get('/pembukuan', [PembukuanController::class, 'index'])->name('pembukuan.index');
+    Route::post('/pembukuan', [PembukuanController::class, 'store'])->name('pembukuan.store');
+    Route::delete('/pembukuan/{id}', [PembukuanController::class, 'destroy'])->name('pembukuan.destroy');
 });
