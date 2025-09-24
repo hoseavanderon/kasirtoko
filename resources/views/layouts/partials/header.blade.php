@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/pos/pos.css') }}?v={{ filemtime(public_path('css/pos/pos.css')) }}">
 </head>
 <body>
     <!-- Header -->
@@ -25,19 +25,7 @@
                                 Online
                             </small>
                         </div>
-
-                        <div>
-                            <div class="pos-tabs d-flex gap-2 mb-3 ms-3 mt-2" role="tablist">
-                                <button class="pos-tab active" id="barang-tab" data-bs-toggle="tab" data-bs-target="#barang-pane" type="button" role="tab">
-                                    <i class="bi bi-basket"></i>
-                                    <span>Barang</span>
-                                </button>
-                                <button class="pos-tab" id="digital-tab" data-bs-toggle="tab" data-bs-target="#digital-pane" type="button" role="tab">
-                                    <i class="bi bi-phone"></i>
-                                    <span>Digital</span>
-                                </button>
-                            </div>          
-                        </div>
+                        @yield('header-tab')
                     </div>
                 </div>
                 <div class="col-md-6 text-center position-relative">
@@ -53,14 +41,18 @@
 
                             <!-- Navbar navigasi -->
                             <div class="d-flex align-items-center gap-2">
-                                <button class="navbar-btn active" title="Home" data-page="home">
-                                    <i class="bi bi-house-door"></i>
+                                <button class="navbar-btn {{ request()->routeIs('home') ? 'active' : '' }}" 
+                                        title="Home" 
+                                        onclick="window.location='{{ route('home') }}'"> 
+                                        <i class="bi bi-house-door"></i> 
+                                </button> 
+                                
+                                <button class="navbar-btn {{ request()->routeIs('history') ? 'active' : '' }}" 
+                                        title="Transaction History" 
+                                        onclick="window.location='{{ route('history') }}'"> 
+                                        <i class="bi bi-clock-history"></i> 
                                 </button>
-
-                                <button class="navbar-btn" title="Transaction History" data-page="history">
-                                    <i class="bi bi-clock-history"></i>
-                                </button>
-
+                                
                                 <button class="navbar-btn" title="Customer" data-page="customer">
                                     <i class="bi bi-person"></i>
                                 </button>
@@ -73,9 +65,11 @@
                                     <i class="bi bi-box-arrow-in-down"></i>
                                 </button>
 
-                                <a href="{{ route('pembukuan.index') }}" class="navbar-btn" title="Pembukuan">
+                                <button class="navbar-btn {{ request()->routeIs('pembukuan.index') ? 'active' : '' }}" 
+                                        title="Pembukuan" 
+                                        onclick="window.location='{{ route('pembukuan.index') }}'">
                                     <i class="bi bi-journal-text"></i>
-                                </a>
+                                </button>
 
                                 <button class="navbar-btn" title="Rincian Hari Ini">
                                     <i class="bi bi-clipboard-data"></i>
@@ -109,51 +103,3 @@
             </div>
         </div>
     </div>
-
-    <div class="pos-container">
-        <div class="container-fluid p-0"> 
-            <div class="row g-0" id="dynamic-page-container">
-                @yield('content')
-            </div>
-        </div>
-    </div>
-
-    @yield('modals')
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/script.js') }}"></script>
-    <script>
-        document.querySelectorAll('.navbar-btn[data-page]').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const page = btn.getAttribute('data-page');
-
-                try {
-                    const response = await fetch(`/partial/${page}`);
-                    if (!response.ok) throw new Error('Page not found');
-
-                    const content = await response.text();
-                    document.getElementById('dynamic-page-container').innerHTML = content;
-
-                    // 🧠 Tambahkan baris ini
-                    if (typeof initPageScripts === 'function') {
-                        initPageScripts(); 
-                    }
-
-                    // ✅ Hapus 'active' dari semua tombol
-                    document.querySelectorAll('.navbar-btn[data-page]').forEach(b => b.classList.remove('active'));
-
-                    // ✅ Tambahkan 'active' ke tombol yang diklik
-                    btn.classList.add('active');
-
-                } catch (err) {
-                    console.error(err);
-                    document.getElementById('dynamic-page-container').innerHTML = `<div class="alert alert-danger">Failed to load content</div>`;
-                }
-            });
-        });
-    </script>
-    @stack('scripts')
-
-    
-</body>
-</html>

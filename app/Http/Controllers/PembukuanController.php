@@ -67,7 +67,7 @@ class PembukuanController extends Controller
 
         $categoryPembukuans = CategoryPembukuan::all();
 
-        return view('pembukuan', compact('saldo', 'riwayat', 'monthsByYear', 'lastUpdated','categoryPembukuans'));
+        return view('pembukuan.index', compact('saldo', 'riwayat', 'monthsByYear', 'lastUpdated','categoryPembukuans'));
     }
 
     public function store(Request $request)

@@ -11,8 +11,9 @@ class Shelf extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name',  // nama rak
-        'code',  // kode rak
+        'name',  
+        'code',
+        'user_id'
     ];
 
     public function products()

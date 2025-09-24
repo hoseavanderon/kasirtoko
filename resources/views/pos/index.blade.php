@@ -1,7 +1,22 @@
-@extends('layout')
+@extends('layouts.pos')
 
 @section('content')
-    @include('partials.home')  
+    @include('pos.partials.body')  
+@endsection
+
+@section('header-tab')
+<div>
+    <div class="pos-tabs d-flex gap-2 mb-3 ms-3 mt-2" role="tablist">
+        <button class="pos-tab active" id="barang-tab" data-bs-toggle="tab" data-bs-target="#barang-pane" type="button" role="tab">
+            <i class="bi bi-basket"></i>
+            <span>Barang</span>
+        </button>
+        <button class="pos-tab" id="digital-tab" data-bs-toggle="tab" data-bs-target="#digital-pane" type="button" role="tab">
+            <i class="bi bi-phone"></i>
+            <span>Digital</span>
+        </button>
+    </div>          
+</div>
 @endsection
 
 @section('modals')

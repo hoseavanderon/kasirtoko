@@ -17,7 +17,21 @@ class HomeController extends Controller
     {
         $categories = Category::with('subcategories')->get();
         $products = Product::all();
-        return view('home', compact('categories','products'));
+        return view('pos.index', compact('categories','products'));
+    }
+
+    public function history()
+    {
+        $today = now()->toDateString();
+
+        $transactions = Transaction::with(['detailTransactions.product'])
+            ->whereDate('created_at', $today)
+            ->get();
+
+        // total dari transaksi langsung (bukan dari detail)
+        $totalPenjualan = $transactions->sum('subtotal');
+
+        return view('history.index', compact('transactions', 'totalPenjualan'));
     }
 
     public function loadPartial($page)
@@ -92,5 +106,43 @@ class HomeController extends Controller
         });
 
         return response()->json(['success' => true]);
+    }
+
+    public function deleteDetail($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $detail = DetailTransaction::findOrFail($id);
+            $transaction = $detail->transaction;
+
+            // Hapus detail-nya dulu
+            $detail->delete();
+
+            // Cek apakah transaction masih punya detail lain
+            if ($transaction->detailTransactions()->count() == 0) {
+                $transaction->delete();
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Detail dan transaksi berhasil dihapus.'
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Detail transaksi berhasil dihapus.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus. ' . $e->getMessage()
+            ]);
+        }
     }
 }

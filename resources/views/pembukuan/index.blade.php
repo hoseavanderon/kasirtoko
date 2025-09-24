@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Transaction History</title>
-    <link rel="stylesheet" href="{{ asset('css/pembukuan.css') }}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-</head>
+@extends('layouts.pembukuan')
+@section('content')    
     <div class="container">
-
         <div class="page-title">
             <h1>Riwayat Pembukuan</h1>
 
@@ -166,31 +156,5 @@
     <script>
         window.transactions = @json($riwayat);
     </script>
+@endsection
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('js/pembukuan.js') }}"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            if (typeof window.initPageScripts === "function") {
-                window.initPageScripts();
-            }
-
-        });
-        function toggleFullscreen(btn) {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().then(() => {
-                    btn.querySelector("i").classList.remove("fa-expand");
-                    btn.querySelector("i").classList.add("fa-compress");
-                }).catch(err => {
-                    console.error(`Error attempting fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen().then(() => {
-                    btn.querySelector("i").classList.remove("fa-compress");
-                    btn.querySelector("i").classList.add("fa-expand");
-                });
-            }
-        }
-    </script>
-</body>
-</html>
