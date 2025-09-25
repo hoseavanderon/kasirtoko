@@ -31,49 +31,47 @@
         <div class="card-dashboard">
             <h5 class="mb-3">Riwayat Transaksi</h5>
             <div id="history-list" class="history-scroll">
-                @foreach($transactions as $trx)
-                    @foreach($trx->detailTransactions as $detail)
-                        <div class="history-item d-flex justify-content-between flex-wrap align-items-center">
+                @forelse($transactions as $trx)
+                  @forelse($trx->detailTransactions as $detail)
+                      <div class="history-item d-flex justify-content-between flex-wrap align-items-center">
                           <div>
-                            <div class="history-title">{{ $detail->product->nama_produk }}</div>
-                            <div class="history-meta">{{ $detail->qty }} x</div>
+                              <div class="history-title">{{ $detail->product->nama_produk }}</div>
+                              <div class="history-meta">{{ $detail->qty }} x</div>
                           </div>
 
                           <div class="d-flex flex-column align-items-end">
-                            <div class="text-success price">
-                              Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
-                            </div>
-                            <small class="text-muted">{{ $trx->created_at->format('H:i') }}</small>
+                              <div class="text-success price">
+                                  Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
+                              </div>
+                              <small class="text-muted">{{ $trx->created_at->format('H:i') }}</small>
 
-                            <div class="dropdown mt-1">
-                              <button class="btn btn-link text-muted p-0" type="button"
-                                      id="dropdownMenuButton{{ $detail->id }}"
-                                      data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-three-dots-vertical"></i>
-                              </button>
-                              <ul class="dropdown-menu dropdown-menu-end"
-                                  aria-labelledby="dropdownMenuButton{{ $detail->id }}">
-                                <li>
-                                  <a href="#" 
-                                    class="dropdown-item text-danger btn-delete-detail" 
-                                    data-id="{{ $detail->id }}"
-                                    data-product="{{ $detail->product->nama_produk }}">
-                                    Delete
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
+                              <div class="dropdown mt-1">
+                                  <button class="btn btn-link text-muted p-0" type="button"
+                                          id="dropdownMenuButton{{ $detail->id }}"
+                                          data-bs-toggle="dropdown" aria-expanded="false">
+                                      <i class="bi bi-three-dots-vertical"></i>
+                                  </button>
+                                  <ul class="dropdown-menu dropdown-menu-end"
+                                      aria-labelledby="dropdownMenuButton{{ $detail->id }}">
+                                      <li>
+                                          <a href="#"
+                                            class="dropdown-item text-danger btn-delete-detail"
+                                            data-id="{{ $detail->id }}"
+                                            data-product="{{ $detail->product->nama_produk }}">
+                                              Delete
+                                          </a>
+                                      </li>
+                                  </ul>
+                              </div>
                           </div>
-                        </div>
-                    @endforeach
-                @endforeach
+                      </div>
+                  @empty
+                      <p class="text-muted">Tidak ada riwayat saat ini</p>
+                  @endforelse
+              @empty
+                  <p class="text-muted">Tidak ada riwayat saat ini</p>
+              @endforelse
             </div>
-
-            @if($transactions->flatMap->detailTransactions->count() > 5)
-                <div class="text-center mt-2">
-                    <button id="load-more-btn" class="btn btn-outline-primary btn-sm">Load more</button>
-                </div>
-            @endif
         </div>
     </div>
 
@@ -114,5 +112,3 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('js/history/history.js') }}"></script>

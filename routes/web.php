@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\PembukuanController;
+use App\Http\Controllers\InventoryController;
 
 Route::get('/', function () {
     return redirect()->route('home');
@@ -23,5 +24,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pembukuan', [PembukuanController::class, 'index'])->name('pembukuan.index');
     Route::post('/pembukuan', [PembukuanController::class, 'store'])->name('pembukuan.store');
     Route::delete('/pembukuan/{id}', [PembukuanController::class, 'destroy'])->name('pembukuan.destroy');
-    
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/shelves/{id}/items', [InventoryController::class, 'getShelfItems']); 
+    Route::get('/inventory/show/{rack}', [InventoryController::class, 'show']); 
+    Route::get('/inventory/history/{productId}', [InventoryController::class, 'history']);
+    Route::get('/inventory/barangmasuk', [InventoryController::class, 'barangMasuk'])->name('inventory.barangmasuk');
 });

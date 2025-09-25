@@ -12,6 +12,7 @@ class Shelf extends Model
 
     protected $fillable = [
         'name',  
+        'icon',
         'code',
         'user_id'
     ];

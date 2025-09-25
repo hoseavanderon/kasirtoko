@@ -211,5 +211,7 @@
     </div>
 </div>
 
+@push('scripts')
 <script src="{{ asset('js/pos/detailpos.js') }}"></script>
+@endpush
 

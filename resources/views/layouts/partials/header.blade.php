@@ -57,12 +57,10 @@
                                     <i class="bi bi-person"></i>
                                 </button>
 
-                                <button class="navbar-btn" title="Inventory History" data-page="inventory-history">
-                                    <i class="bi bi-box-seam"></i>
-                                </button>
-
-                                <button class="navbar-btn" title="Barang Masuk" data-page="barang-masuk">
-                                    <i class="bi bi-box-arrow-in-down"></i>
+                                <button class="navbar-btn {{ request()->routeIs('inventory.index') ? 'active' : '' }}" 
+                                        title="Inventory" 
+                                        onclick="window.location='{{ route('inventory.index') }}'">
+                                    <i class="bi bi-box"></i>
                                 </button>
 
                                 <button class="navbar-btn {{ request()->routeIs('pembukuan.index') ? 'active' : '' }}" 

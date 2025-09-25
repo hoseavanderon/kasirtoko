@@ -34,36 +34,6 @@ class HomeController extends Controller
         return view('history.index', compact('transactions', 'totalPenjualan'));
     }
 
-    public function loadPartial($page)
-    {
-        if (!view()->exists("partials.$page")) {
-            return response('Page not found', 404);
-        }
-
-        $data = [];
-
-        switch ($page) {
-            case 'home':
-                $data['categories'] = Category::with('subcategories')->get();
-                $data['products'] = Product::all();
-                break;
-
-            case 'history':
-                $today = now()->toDateString();
-
-                $transactions = Transaction::with(['detailTransactions.product'])
-                    ->whereDate('created_at', $today)
-                    ->get();
-
-                // total dari transaksi langsung (bukan dari detail)
-                $data['totalPenjualan'] = $transactions->sum('subtotal'); 
-                $data['transactions'] = $transactions;
-                break;
-        }
-
-        return view("partials.$page", $data);
-    }
-
     public function filterProducts(Request $request)
     {
         $id = $request->id;

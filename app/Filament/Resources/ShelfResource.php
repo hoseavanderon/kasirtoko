@@ -36,6 +36,11 @@ class ShelfResource extends Resource
                     ->required()
                     ->maxLength(50),
 
+                Forms\Components\TextInput::make('icon')
+                    ->label('Icon (Font Awesome Class)')
+                    ->placeholder('contoh: fa-solid fa-boxes-stacked')
+                    ->maxLength(100),
+
                 Forms\Components\Hidden::make('user_id')
                     ->default(fn () => Auth::id())
                     ->dehydrated(true)
