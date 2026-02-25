@@ -3,7 +3,7 @@
         <div class="row">
         <div class="col-lg-2">
             <div class="sidebar p-3">
-                <h6 class="text-muted mb-3 fw-bold">Kategori Barang</h6>
+                <h6 class="text-muted mb-3 fw-bold">Kategoriss Barang</h6>
                 <div class="d-grid gap-2" id="categories-list">
                     @foreach ($categories as $category)
                         <div class="mb-2">
