@@ -3,7 +3,7 @@
         <div class="row">
         <div class="col-lg-2">
             <div class="sidebar p-3">
-                <h6 class="text-muted mb-3 fw-bold">Kategoriss Barang</h6>
+                <h6 class="text-muted mb-3 fw-bold">Kategori Barang</h6>
                 <div class="d-grid gap-2" id="categories-list">
                     @foreach ($categories as $category)
                         <div class="mb-2">
@@ -97,7 +97,7 @@
         <div class="col-lg-4 col-md-5">
             <div class="cart-sidebar p-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0">Keranjang Belanja</h6>
+                    <h6 class="fw-bold mb-0">Keranjangs Belanja</h6>
                     <button class="btn btn-outline-danger btn-sm" id="clear-cart-btn">
                         <i class="bi bi-trash"></i>
                     </button>
